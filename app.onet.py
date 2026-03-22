@@ -1245,11 +1245,11 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         <b>ตอบ: {ans_rem} บาท</b></span>"""
                         
                 elif scenario == "money":
+                    # ซื้อของสองอย่าง หาเงินที่เหลือ
                     total = random.choice([1200, 2400, 3600, 4800])
-                    den1 = 3
-                    den2 = 4
-                    num1 = 1
-                    num2 = 1
+                    # Fix fractions like 1/3 and 1/4
+                    den1, den2 = 3, 4
+                    num1, num2 = 1, 1
                     
                     spent1 = (total * num1) // den1
                     spent2 = (total * num2) // den2
@@ -1271,6 +1271,7 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     <b>ตอบ: {rem:,} บาท</b></span>"""
                     
                 else: # pole
+                    # เสาปักในโคลน
                     tot_m = random.choice([12, 15, 18, 20, 24])
                     f_mud = get_vertical_fraction(1, 3)
                     f_water = get_vertical_fraction(1, 4)
