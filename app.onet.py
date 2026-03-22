@@ -81,9 +81,17 @@ def generate_vertical_table_html(a, b, op, result="", is_key=False):
     return f"""
     <div style='margin-left: 60px; display: block; font-family: "Sarabun", sans-serif; font-variant-numeric: tabular-nums; font-size: 26px; margin-top: 15px; margin-bottom: 15px;'>
         <table style='border-collapse: collapse; text-align: right;'>
-            <tr><td style='padding: 0 10px 0 0; border: none;'>{a_str}</td><td rowspan='2' style='vertical-align: middle; text-align: left; padding: 0 0 0 15px; font-size: 28px; font-weight: bold; border: none; color: #333;'>{op}</td></tr>
-            <tr><td style='padding: 5px 10px 5px 0; border: none; border-bottom: 2px solid #000;'>{b_str}</td></tr>
-            <tr><td style='padding: 5px 10px 0 0; border: none; {border_ans} height: 35px;'>{ans_val}</td><td style='border: none;'></td></tr>
+            <tr>
+                <td style='padding: 0 10px 0 0; border: none;'>{a_str}</td>
+                <td rowspan='2' style='vertical-align: middle; text-align: left; padding: 0 0 0 15px; font-size: 28px; font-weight: bold; border: none; color: #333;'>{op}</td>
+            </tr>
+            <tr>
+                <td style='padding: 5px 10px 5px 0; border: none; border-bottom: 2px solid #000;'>{b_str}</td>
+            </tr>
+            <tr>
+                <td style='padding: 5px 10px 0 0; border: none; {border_ans} height: 35px;'>{ans_val}</td>
+                <td style='border: none;'></td>
+            </tr>
         </table>
     </div>
     """
@@ -95,11 +103,14 @@ def get_vertical_math(top_chars, bottom_chars, result_chars, operator="+"):
     r_pad = [""] * (max_len - len(result_chars)) + result_chars
     
     html = "<table style='border-collapse:collapse; font-size:26px; font-weight:bold; text-align:center; margin:15px 0 15px 40px;'><tr>"
-    for c in t_pad: html += f"<td style='padding:5px 12px; width:35px;'>{c}</td>"
+    for c in t_pad: 
+        html += f"<td style='padding:5px 12px; width:35px;'>{c}</td>"
     html += f"<td rowspan='2' style='padding-left:20px; vertical-align:middle; font-size:28px; color:#2c3e50;'>{operator}</td></tr><tr>"
-    for c in b_pad: html += f"<td style='padding:5px 12px; width:35px; border-bottom:2px solid #333;'>{c}</td>"
+    for c in b_pad: 
+        html += f"<td style='padding:5px 12px; width:35px; border-bottom:2px solid #333;'>{c}</td>"
     html += "</tr><tr>"
-    for c in r_pad: html += f"<td style='padding:5px 12px; width:35px; border-bottom:4px double #333;'>{c}</td>"
+    for c in r_pad: 
+        html += f"<td style='padding:5px 12px; width:35px; border-bottom:4px double #333;'>{c}</td>"
     html += "<td></td></tr></table>"
     return html
 
@@ -141,8 +152,10 @@ def draw_beakers_svg(v1_l, v1_ml, v2_l, v2_ml):
     def single_beaker(l, ml, name, color):
         tot = l * 1000 + ml
         d_max = math.ceil(tot/1000)*1000 if tot > 0 else 1000
-        if d_max < 1000: d_max = 1000
-        h = 100; w = 60
+        if d_max < 1000: 
+            d_max = 1000
+        h = 100
+        w = 60
         fill_h = (tot / d_max) * h
         svg = f'<g>'
         svg += f'<rect x="0" y="{20+h-fill_h}" width="{w}" height="{fill_h}" fill="{color}" opacity="0.7"/>'
@@ -151,7 +164,8 @@ def draw_beakers_svg(v1_l, v1_ml, v2_l, v2_ml):
             yy = 20 + h - (i * h / 4)
             svg += f'<line x1="0" y1="{yy}" x2="10" y2="{yy}" stroke="#34495e" stroke-width="2"/>'
         lbl = f"{l} ลิตร {ml} มล." if l > 0 else f"{ml} มล."
-        if ml == 0 and l > 0: lbl = f"{l} ลิตร"
+        if ml == 0 and l > 0: 
+            lbl = f"{l} ลิตร"
         svg += f'<text x="{w/2}" y="{h+45}" font-family="Sarabun" font-size="16" font-weight="bold" fill="#333" text-anchor="middle">{name}</text>'
         svg += f'<text x="{w/2}" y="{h+65}" font-family="Sarabun" font-size="14" fill="#e74c3c" font-weight="bold" text-anchor="middle">{lbl}</text>'
         svg += f'</g>'
@@ -247,9 +261,11 @@ def draw_distance_route_svg(p_names, p_emojis, dist_texts):
     width = 500; height = 120
     svg = f'<div style="text-align:center; margin: 15px 0;"><svg width="{width}" height="{height}">'
     svg += f'<line x1="50" y1="60" x2="250" y2="60" stroke="#34495e" stroke-width="4" stroke-dasharray="10,5"/>'
-    if len(p_names) == 3: svg += f'<line x1="250" y1="60" x2="450" y2="60" stroke="#34495e" stroke-width="4" stroke-dasharray="10,5"/>'
+    if len(p_names) == 3: 
+        svg += f'<line x1="250" y1="60" x2="450" y2="60" stroke="#34495e" stroke-width="4" stroke-dasharray="10,5"/>'
     svg += f'<text x="150" y="45" font-family="Sarabun" font-size="16" font-weight="bold" fill="#c0392b" text-anchor="middle">{dist_texts[0]}</text>'
-    if len(p_names) == 3: svg += f'<text x="350" y="45" font-family="Sarabun" font-size="16" font-weight="bold" fill="#c0392b" text-anchor="middle">{dist_texts[1]}</text>'
+    if len(p_names) == 3: 
+        svg += f'<text x="350" y="45" font-family="Sarabun" font-size="16" font-weight="bold" fill="#c0392b" text-anchor="middle">{dist_texts[1]}</text>'
     xs = [50, 250, 450]
     for i, name in enumerate(p_names):
         emoji = p_emojis[i]
@@ -274,35 +290,47 @@ def draw_ruler_svg(start_cm, end_cm):
         if i % 10 == 0:  
             svg += f'<line x1="{x}" y1="70" x2="{x}" y2="90" stroke="#2c3e50" stroke-width="3"/>'
             svg += f'<text x="{x}" y="110" font-family="sans-serif" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">{i//10}</text>'
-        elif i % 5 == 0: svg += f'<line x1="{x}" y1="70" x2="{x}" y2="85" stroke="#2c3e50" stroke-width="2"/>'
-        else: svg += f'<line x1="{x}" y1="70" x2="{x}" y2="80" stroke="#7f8c8d" stroke-width="1"/>'
+        elif i % 5 == 0: 
+            svg += f'<line x1="{x}" y1="70" x2="{x}" y2="85" stroke="#2c3e50" stroke-width="2"/>'
+        else: 
+            svg += f'<line x1="{x}" y1="70" x2="{x}" y2="80" stroke="#7f8c8d" stroke-width="1"/>'
     svg += '</svg></div>'
     return svg
 
 def draw_long_ruler_svg(length_cm, color="#f1c40f", name=""):
-    scale = 40; base_cm = int(length_cm) - 2
-    if base_cm < 0: base_cm = 0
-    max_cm_display = 6; width = max_cm_display * scale + 60; height = 140
+    scale = 40
+    base_cm = int(length_cm) - 2
+    if base_cm < 0: 
+        base_cm = 0
+    max_cm_display = 6 
+    width = max_cm_display * scale + 60
+    height = 140
     svg = f'<div style="text-align:center; margin: 15px 0;"><svg width="{width}" height="{height}">'
     svg += f'<rect x="20" y="70" width="{max_cm_display*scale + 20}" height="50" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2" rx="5"/>'
-    obj_end_x = 30 + (length_cm - base_cm) * scale; tip_len = min(20, obj_end_x - 10)
+    obj_end_x = 30 + (length_cm - base_cm) * scale
+    tip_len = min(20, obj_end_x - 10)
     svg += f'<rect x="0" y="20" width="{obj_end_x - tip_len}" height="24" fill="{color}" stroke="#333" stroke-width="2"/>'
     svg += f'<polygon points="{obj_end_x - tip_len},20 {obj_end_x - tip_len},44 {obj_end_x},32" fill="#34495e"/>'
     svg += f'<text x="10" y="15" font-family="Sarabun" font-size="14" font-weight="bold" fill="#e74c3c">← {name} (เริ่มจาก 0)</text>'
     svg += f'<line x1="{obj_end_x}" y1="32" x2="{obj_end_x}" y2="70" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4,4"/>'
+
     for i in range(max_cm_display * 10 + 1):
         x = 30 + i * (scale / 10)
         if i % 10 == 0:
             svg += f'<line x1="{x}" y1="70" x2="{x}" y2="90" stroke="#2c3e50" stroke-width="3"/>'
             lbl = base_cm + i//10
             svg += f'<text x="{x}" y="110" font-family="sans-serif" font-size="16" font-weight="bold" fill="#2c3e50" text-anchor="middle">{lbl}</text>'
-        elif i % 5 == 0: svg += f'<line x1="{x}" y1="70" x2="{x}" y2="85" stroke="#2c3e50" stroke-width="2"/>'
-        else: svg += f'<line x1="{x}" y1="70" x2="{x}" y2="80" stroke="#7f8c8d" stroke-width="1"/>'
+        elif i % 5 == 0:
+            svg += f'<line x1="{x}" y1="70" x2="{x}" y2="85" stroke="#2c3e50" stroke-width="2"/>'
+        else:
+            svg += f'<line x1="{x}" y1="70" x2="{x}" y2="80" stroke="#7f8c8d" stroke-width="1"/>'
     svg += '</svg></div>'
     return svg
 
 def draw_fraction_svg(num, den):
-    width = 250; height = 60; slice_w = width / den
+    width = 250
+    height = 60
+    slice_w = width / den
     svg = f'<div style="text-align:center; margin: 10px 0;"><svg width="{width}" height="{height}" style="border: 2px solid #2c3e50;">'
     for i in range(den):
         fill = "#3498db" if i < num else "#ffffff"
@@ -312,27 +340,37 @@ def draw_fraction_svg(num, den):
 
 def draw_clock_svg(h_24, m):
     cx, cy, r = 150, 150, 110
-    h_12 = h_24 % 12; m_angle = math.radians(m * 6 - 90); h_angle = math.radians(h_12 * 30 + (m * 0.5) - 90)
+    h_12 = h_24 % 12
+    m_angle = math.radians(m * 6 - 90)
+    h_angle = math.radians(h_12 * 30 + (m * 0.5) - 90)
+    
     hx, hy = cx + 60 * math.cos(h_angle), cy + 60 * math.sin(h_angle)
     mx, my = cx + 90 * math.cos(m_angle), cy + 90 * math.sin(m_angle)
+    
     h_ext_x, h_ext_y = cx + r * math.cos(h_angle), cy + r * math.sin(h_angle)
     m_ext_x, m_ext_y = cx + r * math.cos(m_angle), cy + r * math.sin(m_angle)
 
     svg = f'<div style="text-align:center;"><svg width="300" height="300">'
     svg += f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="white" stroke="#333" stroke-width="4"/>'
+    
     for i in range(60):
-        angle = math.radians(i * 6 - 90); is_hour = i % 5 == 0; tick_len = 10 if is_hour else 5
+        angle = math.radians(i * 6 - 90)
+        is_hour = i % 5 == 0
+        tick_len = 10 if is_hour else 5
         x1, y1 = cx + (r - tick_len) * math.cos(angle), cy + (r - tick_len) * math.sin(angle)
         x2, y2 = cx + r * math.cos(angle), cy + r * math.sin(angle)
         sw = 3 if is_hour else 1
         svg += f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#333" stroke-width="{sw}"/>'
         if is_hour:
-            num = i // 5; if num == 0: num = 12
+            num = i // 5
+            if num == 0: 
+                num = 12
             nx, ny = cx + (r - 28) * math.cos(angle), cy + (r - 28) * math.sin(angle)
             svg += f'<text x="{nx}" y="{ny}" font-family="sans-serif" font-size="20" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="central">{num}</text>'
 
     svg += f'<line x1="{hx}" y1="{hy}" x2="{h_ext_x}" y2="{h_ext_y}" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>'
     svg += f'<line x1="{mx}" y1="{my}" x2="{m_ext_x}" y2="{m_ext_y}" stroke="#3498db" stroke-width="2" stroke-dasharray="5,5"/>'
+    
     svg += f'<line x1="{cx}" y1="{cy}" x2="{hx}" y2="{hy}" stroke="#e74c3c" stroke-width="6" stroke-linecap="round"/>'
     svg += f'<line x1="{cx}" y1="{cy}" x2="{mx}" y2="{my}" stroke="#3498db" stroke-width="4" stroke-linecap="round"/>'
     svg += f'<circle cx="{cx}" cy="{cy}" r="6" fill="#333"/>'
@@ -341,7 +379,9 @@ def draw_clock_svg(h_24, m):
 
 def draw_scale_svg(kg, kheed, max_kg=5):
     cx, cy, r = 150, 150, 120
-    total_kheed = kg * 10 + kheed; angle = math.radians(total_kheed * 7.2 - 90)
+    total_kheed = kg * 10 + kheed
+    angle = math.radians(total_kheed * 7.2 - 90)
+    
     nx, ny = cx + 100 * math.cos(angle), cy + 100 * math.sin(angle) 
     
     svg = f'<div style="text-align:center;"><svg width="300" height="300">'
@@ -350,7 +390,9 @@ def draw_scale_svg(kg, kheed, max_kg=5):
     svg += f'<text x="{cx}" y="{cy+45}" font-family="sans-serif" font-size="20" font-weight="bold" fill="#7f8c8d" text-anchor="middle">kg</text>'
     
     for i in range(max_kg * 10):
-        tick_angle = math.radians(i * 7.2 - 90); is_kg = i % 10 == 0; tick_len = 25 if is_kg else (15 if i % 5 == 0 else 10) 
+        tick_angle = math.radians(i * 7.2 - 90)
+        is_kg = i % 10 == 0
+        tick_len = 25 if is_kg else (15 if i % 5 == 0 else 10) 
         x1, y1 = cx + (r - tick_len) * math.cos(tick_angle), cy + (r - tick_len) * math.sin(tick_angle)
         x2, y2 = cx + r * math.cos(tick_angle), cy + r * math.sin(tick_angle)
         sw = 4 if is_kg else (3 if i % 5 == 0 else 2) 
@@ -383,7 +425,8 @@ def draw_complex_pictogram_html(item, emoji, pic_val):
 
 def generate_short_division_html(a, b, mode="ห.ร.ม."):
     factors = []
-    ca = a; cb = b
+    ca = a
+    cb = b
     steps_html = ""
     while True:
         found = False
@@ -391,64 +434,93 @@ def generate_short_division_html(a, b, mode="ห.ร.ม."):
             if ca % i == 0 and cb % i == 0:
                 steps_html += f"<tr><td style='text-align: right; padding-right: 10px; font-weight: bold; color: #c0392b;'>{i}</td><td style='border-left: 2px solid #000; border-bottom: 2px solid #000; padding: 5px 15px; text-align: center;'>{ca}</td><td style='border-bottom: 2px solid #000; padding: 5px 15px; text-align: center;'>{cb}</td></tr>"
                 factors.append(i)
-                ca //= i; cb //= i
-                found = True; break
-        if not found: break
+                ca //= i
+                cb //= i
+                found = True
+                break
+        if not found: 
+            break
     if not factors:
-        if mode == "ห.ร.ม.": return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ลองหาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน<br><b>ขั้นที่ 2:</b> พบว่าไม่มีตัวเลขใดเลยที่หารทั้งคู่ลงตัวได้ (นอกจากเลข 1)<br><b>ดังนั้น ห.ร.ม. = 1</b></span>"
-        else: return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ลองหาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน<br><b>ขั้นที่ 2:</b> พบว่าไม่มีตัวเลขใดเลยที่หารทั้งคู่ลงตัว<br><b>ขั้นที่ 3:</b> การหา ค.ร.น. ในกรณีนี้ ให้นำตัวเลขทั้งสองตัวมาคูณกันได้เลย<br><b>ดังนั้น ค.ร.น. = {a} × {b} = {a*b}</b></span>"
+        if mode == "ห.ร.ม.": 
+            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ลองหาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน<br><b>ขั้นที่ 2:</b> พบว่าไม่มีตัวเลขใดเลยที่หารทั้งคู่ลงตัวได้ (นอกจากเลข 1)<br><b>ดังนั้น ห.ร.ม. = 1</b></span>"
+        else: 
+            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ลองหาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน<br><b>ขั้นที่ 2:</b> พบว่าไม่มีตัวเลขใดเลยที่หารทั้งคู่ลงตัว<br><b>ขั้นที่ 3:</b> การหา ค.ร.น. ในกรณีนี้ ให้นำตัวเลขทั้งสองตัวมาคูณกันได้เลย<br><b>ดังนั้น ค.ร.น. = {a} × {b} = {a*b}</b></span>"
+    
     steps_html += f"<tr><td></td><td style='padding: 5px 15px; text-align: center;'>{ca}</td><td style='padding: 5px 15px; text-align: center;'>{cb}</td></tr>"
     table = f"<table style='margin: 10px 0; font-size: 20px; border-collapse: collapse; color: #333;'>{steps_html}</table>"
+    
     if mode == "ห.ร.ม.":
-        ans = math.prod(factors); calc_str = " × ".join(map(str, factors))
+        ans = math.prod(factors)
+        calc_str = " × ".join(map(str, factors))
         sol = f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (การตั้งหารสั้น):</b><br><b>ขั้นที่ 1:</b> หาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน นำมาใส่เป็นตัวหารด้านหน้า<br><b>ขั้นที่ 2:</b> หารไปเรื่อยๆ จนกว่าจะไม่มีตัวเลขใดหารลงตัวทั้งคู่แล้ว<br>{table}<br><b>ขั้นที่ 3:</b> การหา ห.ร.ม. ให้นำเฉพาะ <b>ตัวเลขด้านหน้าเครื่องหมายหารสั้น</b> มาคูณกัน<br><b>ดังนั้น ห.ร.ม. = {calc_str} = {ans}</b></span>"
     else:
-        ans = math.prod(factors) * ca * cb; calc_str = " × ".join(map(str, factors + [ca, cb]))
+        ans = math.prod(factors) * ca * cb
+        calc_str = " × ".join(map(str, factors + [ca, cb]))
         sol = f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (การตั้งหารสั้น):</b><br><b>ขั้นที่ 1:</b> หาตัวเลขที่สามารถหารทั้ง {a} และ {b} ลงตัวพร้อมกัน นำมาใส่เป็นตัวหารด้านหน้า<br><b>ขั้นที่ 2:</b> หารไปเรื่อยๆ จนกว่าจะไม่มีตัวเลขใดหารลงตัวทั้งคู่แล้ว<br>{table}<br><b>ขั้นที่ 3:</b> การหา ค.ร.น. ให้นำ <b>ตัวเลขด้านหน้าทั้งหมด และ เศษที่เหลือด้านล่างสุดทั้งหมด (นำมาเป็นรูปตัว L)</b> มาคูณกัน<br><b>ดังนั้น ค.ร.น. = {calc_str} = {ans}</b></span>"
     return sol
 
 def generate_decimal_vertical_html(a, b, op, is_key=False):
-    str_a = f"{a:.2f}"; str_b = f"{b:.2f}"
+    str_a = f"{a:.2f}"
+    str_b = f"{b:.2f}"
     ans = a + b if op == '+' else round(a - b, 2)
     str_ans = f"{ans:.2f}"
     max_len = max(len(str_a), len(str_b), len(str_ans)) + 1 
-    str_a = str_a.rjust(max_len, " "); str_b = str_b.rjust(max_len, " "); str_ans = str_ans.rjust(max_len, " ")
-    strike = [False] * max_len; top_marks = [""] * max_len
+    
+    str_a = str_a.rjust(max_len, " ")
+    str_b = str_b.rjust(max_len, " ")
+    str_ans = str_ans.rjust(max_len, " ")
+    
+    strike = [False] * max_len
+    top_marks = [""] * max_len
     
     if is_key:
         if op == '+':
             carry = 0
             for i in range(max_len - 1, -1, -1):
-                if str_a[i] == '.': continue
+                if str_a[i] == '.': 
+                    continue
                 da = int(str_a[i]) if str_a[i].strip() else 0
                 db = int(str_b[i]) if str_b[i].strip() else 0
                 s = da + db + carry
                 carry = s // 10
                 if carry > 0 and i > 0:
                     next_i = i - 1
-                    if str_a[next_i] == '.': next_i -= 1
-                    if next_i >= 0: top_marks[next_i] = str(carry)
+                    if str_a[next_i] == '.': 
+                        next_i -= 1
+                    if next_i >= 0: 
+                        top_marks[next_i] = str(carry)
         elif op == '-':
-            a_chars = list(str_a); b_chars = list(str_b)
+            a_chars = list(str_a)
+            b_chars = list(str_b)
             a_digits = [int(c) if c.strip() and c != '.' else 0 for c in a_chars]
             b_digits = [int(c) if c.strip() and c != '.' else 0 for c in b_chars]
             for i in range(max_len - 1, -1, -1):
-                if str_a[i] == '.': continue
+                if str_a[i] == '.': 
+                    continue
                 if a_digits[i] < b_digits[i]:
                     for j in range(i-1, -1, -1):
-                        if str_a[j] == '.': continue
+                        if str_a[j] == '.': 
+                            continue
                         if a_digits[j] > 0 and str_a[j].strip() != "":
-                            strike[j] = True; a_digits[j] -= 1; top_marks[j] = str(a_digits[j])
+                            strike[j] = True
+                            a_digits[j] -= 1
+                            top_marks[j] = str(a_digits[j])
                             for k in range(j+1, i):
-                                if str_a[k] == '.': continue
-                                strike[k] = True; a_digits[k] = 9; top_marks[k] = "9"
-                            strike[i] = True; a_digits[i] += 10; top_marks[i] = str(a_digits[i])
+                                if str_a[k] == '.': 
+                                    continue
+                                strike[k] = True
+                                a_digits[k] = 9
+                                top_marks[k] = "9"
+                            strike[i] = True
+                            a_digits[i] += 10
+                            top_marks[i] = str(a_digits[i])
                             break
                             
     a_tds = ""
     for i in range(max_len):
         val = str_a[i].strip() if str_a[i].strip() else ""
-        if str_a[i] == '.': val = "."
+        if str_a[i] == '.': 
+            val = "."
         td_content = val
         if val and val != '.':
             mark = top_marks[i]
@@ -460,8 +532,10 @@ def generate_decimal_vertical_html(a, b, op, is_key=False):
         
     b_tds = "".join([f"<td style='width: 35px; text-align: center; border-bottom: 2px solid #000; height: 40px; vertical-align: bottom;'>{c.strip() if c.strip() else ('.' if c=='.' else '')}</td>" for c in str_b])
     
-    if is_key: ans_tds = "".join([f"<td style='width: 35px; text-align: center; color: red; font-weight: bold; height: 45px; vertical-align: bottom;'>{c.strip() if c.strip() else ('.' if c=='.' else '')}</td>" for c in str_ans])
-    else: ans_tds = "".join([f"<td style='width: 35px; height: 45px;'></td>" for _ in str_ans])
+    if is_key: 
+        ans_tds = "".join([f"<td style='width: 35px; text-align: center; color: red; font-weight: bold; height: 45px; vertical-align: bottom;'>{c.strip() if c.strip() else ('.' if c=='.' else '')}</td>" for c in str_ans])
+    else: 
+        ans_tds = "".join([f"<td style='width: 35px; height: 45px;'></td>" for _ in str_ans])
         
     return f"""<div style="display: block; margin-left: 60px; margin-top: 15px; margin-bottom: 15px;"><div style="display: inline-block; font-family: 'Sarabun', sans-serif; font-size: 32px; line-height: 1.2;"><table style="border-collapse: collapse;"><tr><td style="width: 20px;"></td>{a_tds}<td style="width: 50px; text-align: left; padding-left: 15px; vertical-align: middle;" rowspan="2">{op}</td></tr><tr><td></td>{b_tds}</tr><tr><td></td>{ans_tds}<td></td></tr><tr><td></td><td colspan="{max_len}" style="border-bottom: 6px double #000; height: 10px;"></td><td></td></tr></table></div></div>"""
 
@@ -570,9 +644,12 @@ def generate_long_division_step_by_step_html(divisor, dividend, equation_html, i
         next_digit = div_str[step['col_index'] + 1] if not is_last_step else ""
         display_str = rem_str if rem_str != "0" or is_last_step else ""
         
-        if not is_last_step and display_str == "": pass
-        else: display_str += next_digit
-        if display_str == "": display_str = next_digit
+        if not is_last_step and display_str == "": 
+            pass
+        else: 
+            display_str += next_digit
+        if display_str == "": 
+            display_str = next_digit
         
         pad_len_rem = step['col_index'] + 1 - len(display_str) + (1 if not is_last_step else 0)
         rem_tds = ""
