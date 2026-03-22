@@ -2372,7 +2372,7 @@ if st.sidebar.button(btn_text, type="primary", use_container_width=True):
         st.session_state['zip_data'] = zip_buffer.getvalue()
 
 if 'ebook_html' in st.session_state:
-    st.success(f"✅ โค้ดฉบับเต็มสมบูรณ์ 100% ไม่มีตัดไม่มีบรรทัดยุบรวม! พร้อมรูปแบบโจทย์ที่หลากหลายยิ่งขึ้นครับ")
+    st.success(f"✅ เพิ่มรูปหกเหลี่ยมลงในโจทย์ไม้ขีดไฟสำเร็จแล้วครับ ตอนนี้มีทั้งสามเหลี่ยม สี่เหลี่ยม ห้าเหลี่ยม และหกเหลี่ยมครบถ้วน")
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
