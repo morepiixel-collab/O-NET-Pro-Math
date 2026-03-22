@@ -180,11 +180,20 @@ def generate_short_division_html(nums, mode="ห.ร.ม."):
                         row_html += f"<td style='{border_left} border-bottom: 2px solid #000; padding: 5px 15px; text-align: center;'>{n}</td>"
                     row_html += "</tr>"
                     steps_html += row_html
-                    current_nums = [n // i for n in current_nums]
+                    
+                    new_nums = []
+                    for n in current_nums:
+                        new_nums.append(n // i)
+                    current_nums = new_nums
+                    
                     found_factor = True
                     break
             else: # ค.ร.น.
-                divisible_count = sum(1 for n in current_nums if n % i == 0)
+                divisible_count = 0
+                for n in current_nums:
+                    if n % i == 0:
+                        divisible_count += 1
+                        
                 if divisible_count >= 2:
                     factors.append(i)
                     row_html = f"<tr><td style='text-align: right; padding-right: 10px; font-weight: bold; color: #c0392b;'>{i}</td>"
@@ -213,10 +222,12 @@ def generate_short_division_html(nums, mode="ห.ร.ม."):
 
     if not factors:
         if mode == "ห.ร.ม.": 
-            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ไม่มีจำนวนเฉพาะใดที่หาร {', '.join(map(str, nums))} ลงตัวพร้อมกัน<br><b>ดังนั้น ห.ร.ม. = 1</b></span>"
+            nums_str = ", ".join(map(str, nums))
+            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ไม่มีจำนวนเฉพาะใดที่หาร {nums_str} ลงตัวพร้อมกัน<br><b>ดังนั้น ห.ร.ม. = 1</b></span>"
         else:
             ans = math.prod(nums)
-            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ไม่มีจำนวนเฉพาะใดที่หารเลขกลุ่มนี้ลงตัวตั้งแต่ 2 จำนวนขึ้นไป<br><b>ขั้นที่ 2:</b> ให้นำตัวเลขทั้งหมดมาคูณกันได้เลย<br><b>ดังนั้น ค.ร.น. = {' × '.join(map(str, nums))} = {ans:,}</b></span>"
+            nums_str = " × ".join(map(str, nums))
+            return f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (Step-by-step):</b><br><b>ขั้นที่ 1:</b> ไม่มีจำนวนเฉพาะใดที่หารเลขกลุ่มนี้ลงตัวตั้งแต่ 2 จำนวนขึ้นไป<br><b>ขั้นที่ 2:</b> ให้นำตัวเลขทั้งหมดมาคูณกันได้เลย<br><b>ดังนั้น ค.ร.น. = {nums_str} = {ans:,}</b></span>"
 
     row_html = "<tr><td></td>"
     for idx, n in enumerate(current_nums):
@@ -232,7 +243,13 @@ def generate_short_division_html(nums, mode="ห.ร.ม."):
     else:
         ans = math.prod(factors) * math.prod(current_nums)
         
-        factors_and_rem = factors + [n for n in current_nums if n != 1]
+        factors_and_rem = []
+        for f in factors:
+            factors_and_rem.append(f)
+        for n in current_nums:
+            if n != 1:
+                factors_and_rem.append(n)
+                
         calc_str = " × ".join(map(str, factors_and_rem))
         
         sol = f"<span style='color: #2c3e50;'><b>วิธีทำอย่างละเอียด (การตั้งหารสั้น):</b><br><b>ขั้นที่ 1:</b> หาจำนวนเฉพาะที่สามารถหารตัวเลขลงตัว <b>อย่างน้อย 2 จำนวนขึ้นไป</b><br><b>ขั้นที่ 2:</b> หารไปเรื่อยๆ (ตัวไหนหารไม่ลงตัวให้ดึงลงมาเหมือนเดิม) จนกว่าจะไม่มีตัวเลขใดหารลงตัวแล้ว<br>{table}<br><b>ขั้นที่ 3:</b> การหา ค.ร.น. ให้นำ <b>ตัวเลขด้านหน้าทั้งหมด และ เศษที่เหลือด้านล่างสุด (เป็นรูปตัว L)</b> มาคูณกัน (ไม่นับเลข 1)<br><b>ดังนั้น ค.ร.น. = {calc_str} = {ans:,}</b></span>"
@@ -349,6 +366,444 @@ def generate_unit_math_html(u_maj, u_min, v1_maj, v1_min, v2_maj, v2_min, op, mu
             ans_str = f"{fin_min:,} {u_min}"
             
         return html, ans_str
+
+def draw_matchstick_pattern(shape):
+    svg = '<div style="text-align:center; margin:15px 0;"><svg height="90" width="450">'
+    
+    def m_line(x1, y1, x2, y2):
+        html_line = f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#d35400" stroke-width="4" stroke-linecap="round"/>'
+        html_line += f'<circle cx="{x1}" cy="{y1}" r="2" fill="#c0392b"/>'
+        html_line += f'<circle cx="{x2}" cy="{y2}" r="2" fill="#c0392b"/>'
+        return html_line
+        
+    if shape == "triangle":
+        svg += m_line(30, 60, 50, 20)
+        svg += m_line(50, 20, 70, 60)
+        svg += m_line(30, 60, 70, 60)
+        svg += '<text x="50" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 1 (3)</text>'
+        
+        ox = 100
+        svg += m_line(ox+30, 60, ox+50, 20)
+        svg += m_line(ox+50, 20, ox+70, 60)
+        svg += m_line(ox+30, 60, ox+70, 60)
+        svg += m_line(ox+70, 60, ox+90, 20)
+        svg += m_line(ox+50, 20, ox+90, 20)
+        svg += f'<text x="{ox+60}" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 2 (5)</text>'
+        
+        ox = 220
+        svg += m_line(ox+30, 60, ox+50, 20)
+        svg += m_line(ox+50, 20, ox+70, 60)
+        svg += m_line(ox+30, 60, ox+70, 60)
+        svg += m_line(ox+70, 60, ox+90, 20)
+        svg += m_line(ox+50, 20, ox+90, 20)
+        svg += m_line(ox+90, 20, ox+110, 60)
+        svg += m_line(ox+70, 60, ox+110, 60)
+        svg += f'<text x="{ox+70}" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 3 (7)</text>'
+        svg += '<text x="380" y="55" font-size="24" font-weight="bold">. . .</text>'
+        
+    elif shape == "square":
+        svg += m_line(30, 20, 60, 20)
+        svg += m_line(60, 20, 60, 50)
+        svg += m_line(60, 50, 30, 50)
+        svg += m_line(30, 50, 30, 20)
+        svg += '<text x="45" y="80" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 1 (4)</text>'
+        
+        ox = 100
+        svg += m_line(ox+30, 20, ox+60, 20)
+        svg += m_line(ox+60, 20, ox+60, 50)
+        svg += m_line(ox+60, 50, ox+30, 50)
+        svg += m_line(ox+30, 50, ox+30, 20)
+        svg += m_line(ox+60, 20, ox+90, 20)
+        svg += m_line(ox+90, 20, ox+90, 50)
+        svg += m_line(ox+90, 50, ox+60, 50)
+        svg += f'<text x="{ox+60}" y="80" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 2 (7)</text>'
+        
+        ox = 220
+        svg += m_line(ox+30, 20, ox+60, 20)
+        svg += m_line(ox+60, 20, ox+60, 50)
+        svg += m_line(ox+60, 50, ox+30, 50)
+        svg += m_line(ox+30, 50, ox+30, 20)
+        svg += m_line(ox+60, 20, ox+90, 20)
+        svg += m_line(ox+90, 20, ox+90, 50)
+        svg += m_line(ox+90, 50, ox+60, 50)
+        svg += m_line(ox+90, 20, ox+120, 20)
+        svg += m_line(ox+120, 20, ox+120, 50)
+        svg += m_line(ox+120, 50, ox+90, 50)
+        svg += f'<text x="{ox+75}" y="80" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 3 (10)</text>'
+        svg += '<text x="390" y="55" font-size="24" font-weight="bold">. . .</text>'
+        
+    svg += '</svg></div>'
+    return svg
+
+def generate_decimal_vertical_html(a, b, op, is_key=False):
+    str_a = f"{a:.2f}"
+    str_b = f"{b:.2f}"
+    
+    if op == '+':
+        ans = a + b
+    else:
+        ans = round(a - b, 2)
+        
+    str_ans = f"{ans:.2f}"
+    max_len = max(len(str_a), len(str_b), len(str_ans)) + 1 
+    
+    str_a = str_a.rjust(max_len, " ")
+    str_b = str_b.rjust(max_len, " ")
+    str_ans = str_ans.rjust(max_len, " ")
+    
+    strike = [False] * max_len
+    top_marks = [""] * max_len
+    
+    if is_key:
+        if op == '+':
+            carry = 0
+            for i in range(max_len - 1, -1, -1):
+                if str_a[i] == '.': 
+                    continue
+                    
+                if str_a[i].strip():
+                    da = int(str_a[i])
+                else:
+                    da = 0
+                    
+                if str_b[i].strip():
+                    db = int(str_b[i])
+                else:
+                    db = 0
+                    
+                s = da + db + carry
+                carry = s // 10
+                
+                if carry > 0 and i > 0:
+                    next_i = i - 1
+                    if str_a[next_i] == '.': 
+                        next_i -= 1
+                    if next_i >= 0: 
+                        top_marks[next_i] = str(carry)
+        elif op == '-':
+            a_chars = list(str_a)
+            b_chars = list(str_b)
+            
+            a_digits = []
+            for c in a_chars:
+                if c.strip() and c != '.':
+                    a_digits.append(int(c))
+                else:
+                    a_digits.append(0)
+                    
+            b_digits = []
+            for c in b_chars:
+                if c.strip() and c != '.':
+                    b_digits.append(int(c))
+                else:
+                    b_digits.append(0)
+                    
+            for i in range(max_len - 1, -1, -1):
+                if str_a[i] == '.': 
+                    continue
+                if a_digits[i] < b_digits[i]:
+                    for j in range(i-1, -1, -1):
+                        if str_a[j] == '.': 
+                            continue
+                        if a_digits[j] > 0 and str_a[j].strip() != "":
+                            strike[j] = True
+                            a_digits[j] -= 1
+                            top_marks[j] = str(a_digits[j])
+                            for k in range(j+1, i):
+                                if str_a[k] == '.': 
+                                    continue
+                                strike[k] = True
+                                a_digits[k] = 9
+                                top_marks[k] = "9"
+                            strike[i] = True
+                            a_digits[i] += 10
+                            top_marks[i] = str(a_digits[i])
+                            break
+                            
+    a_tds = ""
+    for i in range(max_len):
+        if str_a[i].strip():
+            val = str_a[i].strip()
+        else:
+            val = ""
+            
+        if str_a[i] == '.': 
+            val = "."
+            
+        td_content = val
+        if val and val != '.':
+            mark = top_marks[i]
+            if strike[i] and is_key: 
+                td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span style="text-decoration: line-through; text-decoration-color: red; text-decoration-thickness: 2px;">{val}</span></div>'
+            elif mark and is_key: 
+                td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span>{val}</span></div>'
+        a_tds += f"<td style='width: 35px; text-align: center; height: 50px; vertical-align: bottom;'>{td_content}</td>"
+        
+    b_tds = ""
+    for c in str_b:
+        if c.strip():
+            display_c = c.strip()
+        elif c == '.':
+            display_c = '.'
+        else:
+            display_c = ''
+        b_tds += f"<td style='width: 35px; text-align: center; border-bottom: 2px solid #000; height: 40px; vertical-align: bottom;'>{display_c}</td>"
+    
+    ans_tds = ""
+    if is_key: 
+        for c in str_ans:
+            if c.strip():
+                display_c = c.strip()
+            elif c == '.':
+                display_c = '.'
+            else:
+                display_c = ''
+            ans_tds += f"<td style='width: 35px; text-align: center; color: red; font-weight: bold; height: 45px; vertical-align: bottom;'>{display_c}</td>"
+    else: 
+        for _ in str_ans:
+            ans_tds += f"<td style='width: 35px; height: 45px;'></td>"
+        
+    html_out = f"""<div style="display: block; margin-left: 60px; margin-top: 15px; margin-bottom: 15px;">
+        <div style="display: inline-block; font-family: 'Sarabun', sans-serif; font-size: 32px; line-height: 1.2;">
+            <table style="border-collapse: collapse;">
+                <tr>
+                    <td style="width: 20px;"></td>
+                    {a_tds}
+                    <td style="width: 50px; text-align: left; padding-left: 15px; vertical-align: middle;" rowspan="2">{op}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    {b_tds}
+                </tr>
+                <tr>
+                    <td></td>
+                    {ans_tds}
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td colspan="{max_len}" style="border-bottom: 6px double #000; height: 10px;"></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>"""
+    return html_out
+
+def generate_long_division_step_by_step_html(divisor, dividend, equation_html, is_key=False):
+    div_str = str(dividend)
+    div_len = len(div_str)
+    
+    if not is_key:
+        ans_tds_list = []
+        for _ in div_str:
+            ans_tds_list.append('<td style="width: 35px; height: 45px;"></td>')
+        ans_tds_list.append('<td style="width: 35px;"></td>')
+        
+        div_tds_list = []
+        for i, c in enumerate(div_str):
+            if i == 0:
+                left_border = "border-left: 3px solid #000;"
+            else:
+                left_border = ""
+            div_tds_list.append(f'<td style="width: 35px; text-align: center; border-top: 3px solid #000; {left_border} font-size: 38px; height: 50px; vertical-align: bottom;">{c}</td>')
+        div_tds_list.append('<td style="width: 35px;"></td>')
+        
+        empty_rows = ""
+        for _ in range(div_len + 1): 
+            empty_rows += f"<tr><td style='border: none;'></td>"
+            for _ in range(div_len + 1):
+                empty_rows += f"<td style='width: 35px; height: 45px;'></td>"
+            empty_rows += "</tr>"
+            
+        return f"{equation_html}<div style=\"display: block; margin-left: 60px; margin-top: 15px; margin-bottom: 15px;\"><div style=\"display: inline-block; font-family: 'Sarabun', sans-serif; line-height: 1.2;\"><table style=\"border-collapse: collapse;\"><tr><td style=\"border: none;\"></td>{''.join(ans_tds_list)}</tr><tr><td style=\"border: none; text-align: right; padding-right: 12px; vertical-align: bottom; font-size: 38px;\">{divisor}</td>{''.join(div_tds_list)}</tr>{empty_rows}</table></div></div>"
+    
+    steps = []
+    current_val_str = ""
+    ans_str = ""
+    has_started = False
+    
+    for i, digit in enumerate(div_str):
+        current_val_str += digit
+        current_val = int(current_val_str)
+        q = current_val // divisor
+        mul_res = q * divisor
+        rem = current_val - mul_res
+        
+        if not has_started and q == 0 and i < len(div_str) - 1:
+             if rem != 0:
+                 current_val_str = str(rem)
+             else:
+                 current_val_str = ""
+             continue
+             
+        has_started = True
+        ans_str += str(q)
+        
+        cur_chars = list(str(current_val))
+        m_chars = list(str(mul_res).zfill(len(str(current_val))))
+        
+        c_dig = []
+        for c in cur_chars:
+            c_dig.append(int(c))
+            
+        m_dig = []
+        for c in m_chars:
+            m_dig.append(int(c))
+        
+        top_m = [""] * len(c_dig)
+        strik = [False] * len(c_dig)
+        
+        for idx_b in range(len(c_dig) - 1, -1, -1):
+            if c_dig[idx_b] < m_dig[idx_b]:
+                for j in range(idx_b-1, -1, -1):
+                    if c_dig[j] > 0:
+                        strik[j] = True
+                        c_dig[j] -= 1
+                        top_m[j] = str(c_dig[j])
+                        for k in range(j+1, idx_b): 
+                            strik[k] = True
+                            c_dig[k] = 9
+                            top_m[k] = "9"
+                        strik[idx_b] = True
+                        c_dig[idx_b] += 10
+                        top_m[idx_b] = str(c_dig[idx_b])
+                        break
+                        
+        steps.append({'mul_res': mul_res, 'rem': rem, 'col_index': i, 'top_m': top_m, 'strik': strik})
+        
+        if rem != 0:
+            current_val_str = str(rem)
+        else:
+            current_val_str = ""
+        
+    ans_padded = ans_str.rjust(div_len, " ")
+    ans_tds_list = []
+    for c in ans_padded:
+        ans_tds_list.append(f'<td style="width: 35px; text-align: center; color: red; font-weight: bold; font-size: 38px;">{c.strip()}</td>')
+    ans_tds_list.append('<td style="width: 35px;"></td>') 
+    
+    div_tds_list = []
+    if len(steps) > 0:
+        s0 = steps[0]
+    else:
+        s0 = None
+        
+    if s0:
+        s0_start = s0['col_index'] + 1 - len(s0['top_m'])
+    else:
+        s0_start = 0
+        
+    for i, c in enumerate(div_str):
+        if i == 0:
+            left_border = "border-left: 3px solid #000;"
+        else:
+            left_border = ""
+            
+        td_content = c
+        if is_key and s0 and s0_start <= i <= s0['col_index']:
+            t_idx = i - s0_start
+            mark = s0['top_m'][t_idx]
+            is_strik = s0['strik'][t_idx]
+            if is_strik: 
+                td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span style="text-decoration: line-through; text-decoration-color: red; text-decoration-thickness: 2px;">{c}</span></div>'
+            elif mark: 
+                td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span>{c}</span></div>'
+        div_tds_list.append(f'<td style="width: 35px; height: 50px; vertical-align: bottom; text-align: center; border-top: 3px solid #000; {left_border} font-size: 38px;">{td_content}</td>')
+    div_tds_list.append('<td style="width: 35px;"></td>') 
+    
+    html = f"{equation_html}<div style=\"display: block; margin-left: 60px; margin-top: 15px; margin-bottom: 15px;\"><div style=\"display: inline-block; font-family: 'Sarabun', sans-serif; line-height: 1.2;\"><table style=\"border-collapse: collapse;\"><tr><td style=\"border: none;\"></td>{''.join(ans_tds_list)}</tr><tr><td style=\"border: none; text-align: right; padding-right: 12px; vertical-align: bottom; font-size: 38px;\">{divisor}</td>{''.join(div_tds_list)}</tr>"
+    
+    for idx, step in enumerate(steps):
+        mul_res_str = str(step['mul_res'])
+        pad_len = step['col_index'] + 1 - len(mul_res_str)
+        mul_tds = ""
+        for i in range(div_len + 1):
+            if i >= pad_len and i <= step['col_index']:
+                digit_idx = i - pad_len
+                if i <= step['col_index']:
+                    border_b = "border-bottom: 2px solid #000;"
+                else:
+                    border_b = ""
+                mul_tds += f'<td style="width: 35px; height: 50px; vertical-align: bottom; text-align: center; font-size: 38px; {border_b}">{mul_res_str[digit_idx]}</td>'
+            elif i == step['col_index'] + 1: 
+                mul_tds += '<td style="width: 35px; text-align: center; font-size: 38px; color: #333; position: relative; top: -24px;">-</td>'
+            else: 
+                mul_tds += '<td style="width: 35px;"></td>'
+        html += f"<tr><td style='border: none;'></td>{mul_tds}</tr>"
+        
+        if idx == len(steps) - 1:
+            is_last_step = True
+        else:
+            is_last_step = False
+            
+        if not is_last_step:
+            next_step = steps[idx+1]
+        else:
+            next_step = None
+            
+        if next_step:
+            ns_start = next_step['col_index'] + 1 - len(next_step['top_m'])
+        else:
+            ns_start = 0
+            
+        rem_str = str(step['rem'])
+        if not is_last_step:
+            next_digit = div_str[step['col_index'] + 1]
+        else:
+            next_digit = ""
+            
+        if rem_str != "0" or is_last_step:
+            display_str = rem_str
+        else:
+            display_str = ""
+        
+        if not is_last_step and display_str == "": 
+            pass
+        else: 
+            display_str += next_digit
+            
+        if display_str == "": 
+            display_str = next_digit
+        
+        if not is_last_step:
+            pad_len_rem = step['col_index'] + 1 - len(display_str) + 1
+        else:
+            pad_len_rem = step['col_index'] + 1 - len(display_str) + 0
+            
+        rem_tds = ""
+        for i in range(div_len + 1):
+            if not is_last_step:
+                upper_bound = step['col_index'] + 1
+            else:
+                upper_bound = step['col_index'] + 0
+                
+            if i >= pad_len_rem and i <= upper_bound:
+                digit_idx = i - pad_len_rem
+                char_val = display_str[digit_idx]
+                td_content = char_val
+                if is_key and next_step and ns_start <= i <= next_step['col_index']:
+                    t_idx = i - ns_start
+                    mark = next_step['top_m'][t_idx]
+                    is_strik = next_step['strik'][t_idx]
+                    if is_strik: 
+                        td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span style="text-decoration: line-through; text-decoration-color: red; text-decoration-thickness: 2px;">{char_val}</span></div>'
+                    elif mark: 
+                        td_content = f'<div style="position: relative;"><span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 20px; color: red; font-weight: bold;">{mark}</span><span>{char_val}</span></div>'
+                
+                if is_last_step:
+                    border_b2 = "border-bottom: 6px double #000;"
+                else:
+                    border_b2 = ""
+                    
+                rem_tds += f'<td style="width: 35px; height: 50px; vertical-align: bottom; text-align: center; font-size: 38px; {border_b2}">{td_content}</td>'
+            else: 
+                rem_tds += '<td style="width: 35px;"></td>'
+        html += f"<tr><td style='border: none;'></td>{rem_tds}</tr>"
+        
+    html += "</table></div></div>"
+    html += f"<div style='margin-top: 15px; color: #2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>1) นำตัวหาร ({divisor}) ไปหารตัวตั้ง ({dividend}) ทีละหลักจากซ้ายไปขวา<br>2) ท่องสูตรคูณแม่ {divisor} ว่าคูณอะไรแล้วได้ใกล้เคียงหรือเท่ากับตัวตั้งในหลักนั้นที่สุด (แต่ห้ามเกิน)<br>3) ใส่ผลลัพธ์ไว้ด้านบน และนำผลคูณมาลบกันด้านล่าง<br>4) ดึงตัวเลขในหลักถัดไปลงมา แล้วทำซ้ำขั้นตอนเดิมจนหมดทุกหลัก</div>"
+    return html
 
 # ==========================================
 # 2. ฐานข้อมูลหัวข้อข้อสอบสำหรับ O-NET ป.6
@@ -1085,7 +1540,9 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     ans = 2 * target_term + 1
                     
                     if is_challenge:
-                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสามเหลี่ยมเรียงต่อกันไปเรื่อยๆ <br>รูปที่ 1 ใช้ไม้ขีดไฟ 3 ก้าน, รูปที่ 2 ใช้ 5 ก้าน, รูปที่ 3 ใช้ 7 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
+                        shape_choice = "triangle"
+                        svg_graphic = draw_matchstick_pattern(shape_choice)
+                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสามเหลี่ยมเรียงต่อกันไปเรื่อยๆ <br>{svg_graphic}<br>รูปที่ 1 ใช้ไม้ขีดไฟ 3 ก้าน, รูปที่ 2 ใช้ 5 ก้าน, รูปที่ 3 ใช้ 7 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
                         sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (วิเคราะห์รูปทรง):</b><br>
                         <b>ขั้นตอนที่ 1: สังเกตการเพิ่มขึ้นของไม้ขีดไฟ</b><br>
                         👉 รูปที่ 1 ใช้ 3 ก้าน<br>
@@ -1100,10 +1557,12 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         👉 แทนค่า: 1 + ({target_term} × 2) = 1 + {target_term * 2} = <b>{ans} ก้าน</b><br>
                         <b>ตอบ: {ans} ก้าน</b></span>"""
                     else:
+                        shape_choice = "square"
+                        svg_graphic = draw_matchstick_pattern(shape_choice)
                         target_term = random.randint(10, 20)
                         ans = 3 * target_term + 1
                         
-                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสี่เหลี่ยมจัตุรัสเรียงต่อกันไปเรื่อยๆ <br>รูปที่ 1 ใช้ไม้ขีดไฟ 4 ก้าน, รูปที่ 2 ใช้ 7 ก้าน, รูปที่ 3 ใช้ 10 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
+                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสี่เหลี่ยมจัตุรัสเรียงต่อกันไปเรื่อยๆ <br>{svg_graphic}<br>รูปที่ 1 ใช้ไม้ขีดไฟ 4 ก้าน, รูปที่ 2 ใช้ 7 ก้าน, รูปที่ 3 ใช้ 10 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
                         sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (วิเคราะห์รูปทรง):</b><br>
                         <b>ขั้นตอนที่ 1: สังเกตการเพิ่มขึ้นของไม้ขีดไฟ</b><br>
                         👉 รูปที่ 1 ใช้ 4 ก้าน<br>
@@ -1656,7 +2115,7 @@ if st.sidebar.button(btn_text, type="primary", use_container_width=True):
         st.session_state['zip_data'] = zip_buffer.getvalue()
 
 if 'ebook_html' in st.session_state:
-    st.success(f"✅ โค้ดฉบับเต็มสมบูรณ์ 100% ไม่มีตัดไม่มีบรรทัดยุบรวม! พร้อมรูปแบบโจทย์ที่หลากหลายยิ่งขึ้นครับ")
+    st.success(f"✅ ลิขสิทธิ์นี้เป็นของ บ้านทีเด็ด เท่านั้น ห้ามนำไปขาย หรือแจกจ่าย ก่อนได้รับอนุญาต จาก บ้านทีเด็ด")
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
