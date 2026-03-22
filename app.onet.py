@@ -1089,47 +1089,106 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
 
             elif actual_sub_t == "แบบรูปและความสัมพันธ์ (Patterns)":
                 if is_challenge:
+                    pattern_type = random.choice(["square", "cube", "square_plus_one", "double_square"])
                     target_term = random.randint(10, 20)
-                    ans = target_term ** 2
-                    q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br><span style='font-size:24px; font-weight:bold; margin-left: 20px;'>1, 4, 9, 16, 25, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (อนุกรมยกกำลังสอง):</b><br>
+                    
+                    if pattern_type == "square":
+                        seq = []
+                        for i in range(1, 6):
+                            seq.append(i**2)
+                        ans = target_term**2
+                        formula_txt = "ตำแหน่งที่ N คูณกับตัวเอง (N × N หรือ N²)"
+                        calc_txt = f"{target_term} × {target_term}"
+                    elif pattern_type == "cube":
+                        seq = []
+                        for i in range(1, 6):
+                            seq.append(i**3)
+                        ans = target_term**3
+                        formula_txt = "ตำแหน่งที่ N คูณกัน 3 ครั้ง (N × N × N หรือ N³)"
+                        calc_txt = f"{target_term} × {target_term} × {target_term}"
+                    elif pattern_type == "square_plus_one":
+                        seq = []
+                        for i in range(1, 6):
+                            seq.append(i**2 + 1)
+                        ans = target_term**2 + 1
+                        formula_txt = "นำตำแหน่งที่ N ยกกำลังสอง แล้วบวกเพิ่มอีก 1 (N² + 1)"
+                        calc_txt = f"({target_term} × {target_term}) + 1"
+                    else: 
+                        seq = []
+                        for i in range(1, 6):
+                            seq.append(2 * (i**2))
+                        ans = 2 * (target_term**2)
+                        formula_txt = "นำตำแหน่งที่ N ยกกำลังสอง แล้วคูณด้วย 2 (2 × N²)"
+                        calc_txt = f"2 × ({target_term} × {target_term})"
+                    
+                    seq_str = ", ".join(map(str, seq))
+                    
+                    svg_graphic = ""
+                    if pattern_type == "square":
+                        svg_graphic = f'<div style="text-align:center; margin:10px 0;"><svg height="60" width="300">'
+                        for i in range(1, 4):
+                            x_offset = (i-1)*80 + 20
+                            size = 15
+                            for r in range(i):
+                                for c in range(i):
+                                    svg_graphic += f'<rect x="{x_offset + c*size}" y="{50 - i*size + r*size}" width="{size-2}" height="{size-2}" fill="#3498db" rx="2"/>'
+                            svg_graphic += f'<text x="{x_offset + (i*size)/2}" y="58" font-family="sans-serif" font-size="12" text-anchor="middle">{i**2}</text>'
+                        svg_graphic += '</svg></div>'
+
+                    q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br>{svg_graphic}<span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{seq_str}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (อนุกรมประยุกต์):</b><br>
                     <b>ขั้นตอนที่ 1: วิเคราะห์ความสัมพันธ์ของตำแหน่งกับตัวเลข</b><br>
-                    👉 จำนวนที่ 1 คือ 1 ซึ่งเกิดจาก (1 × 1) หรือ 1²<br>
-                    👉 จำนวนที่ 2 คือ 4 ซึ่งเกิดจาก (2 × 2) หรือ 2²<br>
-                    👉 จำนวนที่ 3 คือ 9 ซึ่งเกิดจาก (3 × 3) หรือ 3²<br>
-                    👉 จำนวนที่ 4 คือ 16 ซึ่งเกิดจาก (4 × 4) หรือ 4²<br>
+                    👉 จำนวนที่ 1 คือ {seq[0]}<br>
+                    👉 จำนวนที่ 2 คือ {seq[1]}<br>
+                    👉 จำนวนที่ 3 คือ {seq[2]}<br>
+                    👉 จำนวนที่ 4 คือ {seq[3]}<br>
                     <b>ขั้นตอนที่ 2: สรุปกฎของแบบรูป (สูตรสมการ)</b><br>
-                    👉 เราจะเห็นได้ชัดเจนว่า "ตัวเลขในลำดับนั้น เกิดจาก ตำแหน่งที่ตั้ง นำมาคูณด้วยตัวมันเอง (ยกกำลังสอง)"<br>
-                    &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด: จำนวนที่ N = N × N</b><br>
+                    👉 เราจะเห็นได้ว่า ตัวเลขในลำดับนั้น เกิดจาก: <b>{formula_txt}</b><br>
                     <b>ขั้นตอนที่ 3: แทนค่าหาคำตอบที่โจทย์ถาม</b><br>
                     👉 โจทย์ถามหาจำนวนที่ {target_term}<br>
-                    👉 แทน N ด้วย {target_term} ลงในสมการ: {target_term} × {target_term} = <b>{ans:,}</b><br>
+                    👉 แทนค่าลงในสมการ: {calc_txt} = <b>{ans:,}</b><br>
                     <b>ตอบ: {ans:,}</b></span>"""
                 else:
-                    start_num = random.randint(2, 15)
-                    diff = random.randint(3, 9)
-                    target_term = random.randint(15, 30)
-                    ans = start_num + (target_term - 1) * diff
+                    start_num = random.randint(2, 50)
+                    diff = random.randint(4, 15)
+                    is_add = random.choice([True, False])
                     
-                    seq = []
-                    for i in range(4):
-                        seq.append(start_num + i * diff)
+                    if not is_add:
+                        start_num = random.randint(200, 500)
+                        
+                    target_term = random.randint(15, 40)
                     
-                    q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br><span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{seq[0]}, {seq[1]}, {seq[2]}, {seq[3]}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
+                    if is_add:
+                        ans = start_num + (target_term - 1) * diff
+                        seq = []
+                        for i in range(4):
+                            seq.append(start_num + i * diff)
+                        word_diff = f"เพิ่มขึ้น <b>+{diff}</b>"
+                        sign = "+"
+                    else:
+                        ans = start_num - (target_term - 1) * diff
+                        seq = []
+                        for i in range(4):
+                            seq.append(start_num - i * diff)
+                        word_diff = f"ลดลง <b>-{diff}</b>"
+                        sign = "-"
+                    
+                    seq_str = ", ".join(map(str, seq))
+                    
+                    q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br><span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{seq_str}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (อนุกรมเลขคณิต):</b><br>
                     <b>ขั้นตอนที่ 1: หาความห่างของตัวเลข (ระยะห่าง)</b><br>
-                    👉 สังเกตจาก {seq[0]} ไป {seq[1]} เพิ่มขึ้น <b>+{diff}</b><br>
-                    👉 จาก {seq[1]} ไป {seq[2]} เพิ่มขึ้น <b>+{diff}</b><br>
-                    👉 แบบรูปนี้เป็นการ <b>เพิ่มขึ้นทีละ {diff} เท่าๆ กัน</b><br>
+                    👉 สังเกตจาก {seq[0]} ไป {seq[1]} {word_diff}<br>
+                    👉 จาก {seq[1]} ไป {seq[2]} {word_diff}<br>
+                    👉 แบบรูปนี้เป็นการ <b>{word_diff} ทีละเท่าๆ กัน</b><br>
                     <b>ขั้นตอนที่ 2: ตั้งสมการความสัมพันธ์ (สูตรลัด)</b><br>
                     👉 การหาก้าวที่ต้องกระโดดทั้งหมด คือ (ตำแหน่งเป้าหมาย - 1)<br>
-                    👉 นำก้าวที่ต้องกระโดด ไปคูณกับระยะห่างแต่ละก้าว แล้วค่อยไปบวกตัวตั้งต้น<br>
-                    &nbsp;&nbsp;&nbsp; <b>👉 สมการ: คำตอบ = ตัวตั้งต้น + [ (ตำแหน่งเป้าหมาย - 1) × ระยะห่าง ]</b><br>
+                    👉 นำก้าวที่ต้องกระโดด ไปคูณกับระยะห่างแต่ละก้าว แล้วค่อยนำไปกระทำกับตัวตั้งต้น<br>
+                    &nbsp;&nbsp;&nbsp; <b>👉 สมการ: คำตอบ = ตัวตั้งต้น {sign} [ (ตำแหน่งเป้าหมาย - 1) × ระยะห่าง ]</b><br>
                     <b>ขั้นตอนที่ 3: แทนค่าคำนวณ</b><br>
-                    👉 แทนค่าลงไป: {start_num} <b style='color:green;'>+ [ ({target_term} - 1) × {diff} ]</b><br>
+                    👉 แทนค่าลงไป: {start_num} <b style='color:red;'>{sign} [ ({target_term} - 1) × {diff} ]</b><br>
                     👉 คำนวณในวงเล็บ: {target_term - 1} × {diff} = <b>{(target_term - 1) * diff}</b><br>
-                    👉 นำไปบวกตัวเริ่มต้น: {start_num} + {(target_term - 1) * diff} = <b>{ans:,}</b><br>
-                    &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด: จำนวนที่ {target_term} = {ans:,}</b><br>
+                    👉 คำนวณขั้นสุดท้าย: {start_num} {sign} {(target_term - 1) * diff} = <b>{ans:,}</b><br>
                     <b>ตอบ: {ans:,}</b></span>"""
 
             elif actual_sub_t == "สถิติและค่าเฉลี่ย":
@@ -1160,29 +1219,32 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด: น้ำหนักคนใหม่ = {new_item} กก.</b><br>
                     <b>ตอบ: {new_item} กิโลกรัม</b></span>"""
                 else:
+                    num_items = random.randint(4, 6)
                     nums = []
-                    for _ in range(4):
-                        nums.append(random.randint(10, 50))
+                    for _ in range(num_items):
+                        nums.append(random.randint(20, 150))
                         
                     total_sum = sum(nums)
-                    avg = total_sum // 4
-                    if total_sum % 4 != 0:
-                        nums[3] += 4 - (total_sum % 4)
+                    if total_sum % num_items != 0:
+                        nums[-1] += num_items - (total_sum % num_items)
                         total_sum = sum(nums)
-                        avg = total_sum // 4
                         
-                    q = f"<b>{name}</b> ทำการจดบันทึกราคาสินค้า 4 ชิ้น ได้แก่ <b>{nums[0]}, {nums[1]}, {nums[2]}, และ {nums[3]} บาท</b><br>จงหาราคา <b>'เฉลี่ย'</b> ของสินค้ากลุ่มนี้?"
+                    avg = total_sum // num_items
+                    
+                    nums_str = ", ".join(map(str, nums[:-1])) + f", และ {nums[-1]}"
+                    
+                    q = f"<b>{name}</b> ทำการจดบันทึกราคาสินค้า {num_items} ชิ้น ได้แก่ <b>{nums_str} บาท</b><br>จงหาราคา <b>'เฉลี่ย'</b> ของสินค้ากลุ่มนี้?"
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step:</b><br>
                     <b>ขั้นตอนที่ 1: เข้าใจสูตรของค่าเฉลี่ย</b><br>
                     👉 สูตรการหาค่าเฉลี่ย = <b>(ผลรวมของข้อมูลทั้งหมด) ÷ (จำนวนข้อมูลที่มี)</b><br>
                     <b>ขั้นตอนที่ 2: หาผลรวมของข้อมูลทั้งหมด</b><br>
-                    👉 นำราคาสินค้าทั้ง 4 ชิ้นมาบวกเข้าด้วยกัน: <br>
-                    &nbsp;&nbsp;&nbsp; {nums[0]} + {nums[1]} + {nums[2]} + {nums[3]} = <b>{total_sum} บาท</b><br>
+                    👉 นำราคาสินค้าทั้ง {num_items} ชิ้นมาบวกเข้าด้วยกัน: <br>
+                    &nbsp;&nbsp;&nbsp; {' + '.join(map(str, nums))} = <b>{total_sum:,} บาท</b><br>
                     <b>ขั้นตอนที่ 3: นำไปหารด้วยจำนวนข้อมูล</b><br>
-                    👉 เนื่องจากมีสินค้าทั้งหมด 4 ชิ้น ให้นำผลรวมไปตั้งหารด้วย 4<br>
-                    👉 ตั้งสมการ: {total_sum} <b style='color:red;'>÷ 4</b> = <b>{avg} บาท</b><br>
-                    &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด: ราคาเฉลี่ย = {avg} บาท</b><br>
-                    <b>ตอบ: {avg} บาท</b></span>"""
+                    👉 เนื่องจากมีสินค้าทั้งหมด {num_items} ชิ้น ให้นำผลรวมไปตั้งหารด้วย {num_items}<br>
+                    👉 ตั้งสมการ: {total_sum:,} <b style='color:red;'>÷ {num_items}</b> = <b>{avg:,} บาท</b><br>
+                    &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด: ราคาเฉลี่ย = {avg:,} บาท</b><br>
+                    <b>ตอบ: {avg:,} บาท</b></span>"""
 
             elif actual_sub_t == "ปริมาตรและความจุ":
                 if is_challenge:
@@ -1251,138 +1313,137 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     <b>ตอบ: {ans_str}</b></span>"""
 
             elif actual_sub_t == "การแปลงหน่วยและเปรียบเทียบ":
-                cat_choices = ["compare", "add_sub"]
-                q_cat = random.choice(cat_choices)
-                
-                type_choices = ["m_cm", "km_m", "kg_g", "ton_kg"]
-                selected_type = random.choice(type_choices)
-                
-                if selected_type == "m_cm":
-                    u_major = "เมตร"
-                    u_minor = "เซนติเมตร"
-                    multiplier = 100
-                elif selected_type == "km_m":
-                    u_major = "กิโลเมตร"
-                    u_minor = "เมตร"
-                    multiplier = 1000
-                elif selected_type == "kg_g":
-                    u_major = "กิโลกรัม"
-                    u_minor = "กรัม"
-                    multiplier = 1000
-                else: 
-                    u_major = "ตัน"
-                    u_minor = "กิโลกรัม"
-                    multiplier = 1000
+                if is_challenge:
+                    scenario_choices = ["ribbon", "rice"]
+                    scenario = random.choice(scenario_choices)
                     
-                if q_cat == "compare":
-                    if is_challenge:
-                        val_major = random.randint(5, 50)
-                    else:
-                        val_major = random.randint(2, 20)
+                    if scenario == "ribbon":
+                        m_len = random.randint(5, 12) + random.choice([0.2, 0.5, 0.8])
+                        cm_total = int(m_len * 100)
+                        boxes = random.randint(3, 6)
+                        cm_per_box = random.randint(40, 90)
+                        used_cm = boxes * cm_per_box
                         
-                    val_minor = random.randint(50, multiplier-10)
-                    
-                    total_minor_1 = (val_major * multiplier) + val_minor
-                    
-                    case_choices = ["greater", "less", "equal"]
-                    case = random.choice(case_choices)
-                    
-                    if case == "equal":
-                        total_minor_2 = total_minor_1
-                    elif case == "greater":
-                        total_minor_2 = total_minor_1 - random.randint(1, multiplier - 1)
-                    else:
-                        total_minor_2 = total_minor_1 + random.randint(1, multiplier - 1)
-
-                    str_val_1 = f"{val_major} {u_major} {val_minor} {u_minor}"
-                    str_val_2 = f"{total_minor_2:,} {u_minor}"
-
-                    if random.choice([True, False]):
-                        item_A = str_val_1
-                        item_B = str_val_2
-                        val_A = total_minor_1
-                        val_B = total_minor_2
-                    else:
-                        item_A = str_val_2
-                        item_B = str_val_1
-                        val_A = total_minor_2
-                        val_B = total_minor_1
-
-                    if total_minor_1 == total_minor_2:
-                        final_ans = "เท่ากัน"
-                    else:
-                        if selected_type in ["m_cm", "km_m"]:
-                            if val_A > val_B:
-                                final_ans = "ยาวกว่า/ไกลกว่า"
-                            else:
-                                final_ans = "สั้นกว่า/ใกล้กว่า"
-                        else:
-                            if val_A > val_B:
-                                final_ans = "หนักกว่า"
-                            else:
-                                final_ans = "เบากว่า"
-                        
-                    q = f"จงเปรียบเทียบว่า <b>{item_A}</b> กับ <b>{item_B}</b> สิ่งใดมีค่า <b>มากกว่า/ยาวกว่า/หนักกว่า</b> กัน?<br><span style='font-size:22px; font-weight:bold; margin-left: 20px;'>{item_A} &nbsp;&nbsp; ____________________ &nbsp;&nbsp; {item_B}</span>"
-
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step:</b><br>
-                    <b>ขั้นที่ 1: ทบทวนความสัมพันธ์ของหน่วย</b><br>
-                    👉 เรารู้ว่า 1 {u_major} มีค่าเท่ากับ <b>{multiplier:,} {u_minor}</b> เสมอ<br>
-                    <b>ขั้นที่ 2: สร้างสมการแปลงหน่วยให้เป็นหน่วยย่อยเหมือนกันทั้งหมด</b><br>
-                    👉 เราจะแปลงฝั่ง <b>{str_val_1}</b> ให้เป็นหน่วย <b>{u_minor}</b> เพียวๆ เพื่อให้ง่ายต่อการเปรียบเทียบ<br>
-                    👉 นำไปเข้าสมการ: นำ {val_major} ไปคูณ {multiplier:,} แล้วบวกด้วย {val_minor} <br>
-                    👉 ({val_major} <b style='color:red;'>× {multiplier:,}</b>) <b style='color:green;'>+ {val_minor}</b> = {val_major * multiplier:,} <b style='color:green;'>+ {val_minor}</b><br>
-                    &nbsp;&nbsp;&nbsp; <b>👉 สมการล่าสุด:</b> แปลงได้เป็น <b>{total_minor_1:,} {u_minor}</b><br>
-                    <b>ขั้นที่ 3: เปรียบเทียบตัวเลข</b><br>"""
-
-                    if val_A == val_B:
-                        sol += f"👉 จะเห็นว่า {total_minor_1:,} {u_minor} มีค่า <b>เท่ากับ</b> {total_minor_2:,} {u_minor} พอดี!<br>"
-                    else:
-                        if val_A < val_B:
-                            comp_sign = "น้อยกว่า"
-                        else:
-                            comp_sign = "มากกว่า"
+                        while used_cm >= cm_total:
+                            m_len += 2
+                            cm_total = int(m_len * 100)
                             
-                        sol += f"👉 นำมาเปรียบเทียบฝั่งซ้าย ({val_A:,} {u_minor}) กับฝั่งขวา ({val_B:,} {u_minor})<br>"
-                        sol += f"👉 จะเห็นว่าตัวเลข {val_A:,} <b>{comp_sign}</b> {val_B:,}<br>"
-
-                    sol += f"<b>ตอบ: ฝั่งซ้าย {final_ans} ฝั่งขวา</b></span>"
+                        rem_cm = cm_total - used_cm
+                        
+                        q = f"<b>{name}</b> มีริบบิ้นยาว <b>{m_len} เมตร</b> นำไปตัดห่อของขวัญ <b>{boxes} กล่อง</b> กล่องละ <b>{cm_per_box} เซนติเมตร</b><br>จะเหลือริบบิ้นยาวกี่เซนติเมตร?"
+                        sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step:</b><br>
+                        <b>ขั้นที่ 1: แปลงหน่วยให้เหมือนกัน (เมตร ➔ เซนติเมตร)</b><br>
+                        👉 1 เมตร = 100 เซนติเมตร<br>
+                        👉 ริบบิ้นยาว {m_len} เมตร = {m_len} × 100 = <b>{cm_total:,} เซนติเมตร</b><br>
+                        <b>ขั้นที่ 2: คำนวณความยาวริบบิ้นที่ใช้ไปทั้งหมด</b><br>
+                        👉 ห่อของขวัญ {boxes} กล่อง กล่องละ {cm_per_box} ซม.<br>
+                        👉 ใช้ไป = {boxes} × {cm_per_box} = <b>{used_cm:,} เซนติเมตร</b><br>
+                        <b>ขั้นที่ 3: หาความยาวริบบิ้นที่เหลือ</b><br>
+                        👉 เหลือ = ความยาวทั้งหมด - ความยาวที่ใช้ไป<br>
+                        👉 เหลือ = {cm_total:,} - {used_cm:,} = <b>{rem_cm:,} เซนติเมตร</b><br>
+                        <b>ตอบ: {rem_cm:,} เซนติเมตร</b></span>"""
+                    else:
+                        bags = random.randint(3, 8)
+                        kg_per_bag = random.randint(1, 3) + random.choice([0.25, 0.5, 0.75])
+                        total_g = int(bags * kg_per_bag * 1000)
+                        small_bag_choices = [200, 250, 500]
+                        small_bag_g = random.choice(small_bag_choices)
+                        ans_bags = total_g // small_bag_g
+                        
+                        q = f"<b>{name}</b> ซื้อข้าวสาร <b>{bags} ถุง</b> ถุงละ <b>{kg_per_bag} กิโลกรัม</b> นำมารวมกันแล้วแบ่งใส่ถุงเล็ก ถุงละ <b>{small_bag_g} กรัม</b><br>จะแบ่งข้าวสารได้ทั้งหมดกี่ถุงพอดี?"
+                        sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step:</b><br>
+                        <b>ขั้นที่ 1: หาปริมาณข้าวสารทั้งหมด</b><br>
+                        👉 มีข้าวสาร {bags} ถุง ถุงละ {kg_per_bag} กิโลกรัม<br>
+                        👉 รวมทั้งหมด = {bags} × {kg_per_bag} = <b>{bags * kg_per_bag} กิโลกรัม</b><br>
+                        <b>ขั้นที่ 2: แปลงหน่วย (กิโลกรัม ➔ กรัม)</b><br>
+                        👉 1 กิโลกรัม = 1,000 กรัม<br>
+                        👉 {bags * kg_per_bag} กิโลกรัม = {bags * kg_per_bag} × 1,000 = <b>{total_g:,} กรัม</b><br>
+                        <b>ขั้นที่ 3: คำนวณจำนวนถุงเล็กที่แบ่งได้</b><br>
+                        👉 นำปริมาณทั้งหมด หารด้วย ปริมาณต่อถุงเล็ก<br>
+                        👉 {total_g:,} ÷ {small_bag_g} = <b>{ans_bags} ถุง</b><br>
+                        <b>ตอบ: {ans_bags} ถุง</b></span>"""
                 else: 
-                    op_choices = ["+", "-"]
-                    op = random.choice(op_choices)
-                    v1_maj = random.randint(3, 20)
-                    v1_min = random.randint(1, multiplier-1)
+                    type_choices = ["m_cm", "km_m", "kg_g"]
+                    selected_type = random.choice(type_choices)
                     
-                    if op == "-":
-                        v2_maj = random.randint(1, v1_maj-1)
+                    if selected_type == "m_cm":
+                        multiplier = 100
+                        u_major = "เมตร"
+                        u_minor = "เซนติเมตร"
+                    elif selected_type == "km_m":
+                        multiplier = 1000
+                        u_major = "กิโลเมตร"
+                        u_minor = "เมตร"
                     else:
-                        v2_maj = random.randint(1, 20)
+                        multiplier = 1000
+                        u_major = "กิโลกรัม"
+                        u_minor = "กรัม"
                         
-                    v2_min = random.randint(1, multiplier-1)
+                    dec_choices = [0.1, 0.25, 0.5, 0.75, 0.2, 0.8]
+                    dec_val = random.choice(dec_choices)
+                    val_major_int = random.randint(2, 15)
+                    val_A_major = val_major_int + dec_val
+                    val_A_minor_total = int(val_A_major * multiplier)
                     
-                    if op == "-":
-                        if v1_min >= v2_min:
-                            v1_min, v2_min = v2_min, v1_min + (multiplier//2)
-                            if v2_min >= multiplier: 
-                                v2_min = multiplier - 1
-                    
-                    if op == "+":
-                        q = f"จงหาผลลัพธ์ของ: <b>{v1_maj} {u_major} {v1_min} {u_minor}</b> <b>รวมกับ</b> <b>{v2_maj} {u_major} {v2_min} {u_minor}</b>"
+                    diff_amount = random.randint(10, 200)
+                    if random.choice([True, False]):
+                        val_B_minor_total = val_A_minor_total + diff_amount
                     else:
-                        q = f"จงหาผลลัพธ์ของ: <b>{v1_maj} {u_major} {v1_min} {u_minor}</b> <b>ต่างกับ</b> <b>{v2_maj} {u_major} {v2_min} {u_minor} อยู่เท่าไร?</b>"
+                        val_B_minor_total = val_A_minor_total - diff_amount
                         
-                    table_html, ans_str = generate_unit_math_html(u_major, u_minor, v1_maj, v1_min, v2_maj, v2_min, op, multiplier)
-                    
-                    if op == "+":
-                        word_op = "บวก"
+                    if random.choice([True, False]):
+                        item_A = f"{val_A_major} {u_major}"
+                        item_B = f"{val_B_minor_total:,} {u_minor}"
+                        val_A = val_A_minor_total
+                        val_B = val_B_minor_total
+                        is_a_major = True
                     else:
-                        word_op = "ลบ"
+                        item_A = f"{val_B_minor_total:,} {u_minor}"
+                        item_B = f"{val_A_major} {u_major}"
+                        val_A = val_B_minor_total
+                        val_B = val_A_minor_total
+                        is_a_major = False
                         
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีทำอย่างละเอียด (การตั้ง{word_op}แบบข้ามหน่วย):</b><br>
-                    👉 หลักการสำคัญคือ ต้องตั้งหน่วย <b>{u_major}</b> และ <b>{u_minor}</b> ให้ตรงกัน<br>
-                    👉 ถ้ายอดรวมหน่วย{u_minor}ถึง {multiplier:,} เมื่อไหร่ ให้ปัดทดไปเป็น 1 {u_major}<br>
-                    👉 ถ้ายอดลบหน่วย{u_minor}ไม่พอ ให้ขอยืมหน่วย{u_major}มา 1 (ซึ่งจะแตกออกเท่ากับ {multiplier:,} {u_minor})<br>
-                    {table_html}
-                    <b>ตอบ: {ans_str}</b></span>"""
+                    if val_A > val_B:
+                        if selected_type == "kg_g":
+                            comp_word = "หนักกว่า"
+                        elif selected_type == "m_cm":
+                            comp_word = "ยาวกว่า"
+                        else:
+                            comp_word = "ไกลกว่า"
+                    else:
+                        if selected_type == "kg_g":
+                            comp_word = "เบากว่า"
+                        elif selected_type == "m_cm":
+                            comp_word = "สั้นกว่า"
+                        else:
+                            comp_word = "ใกล้กว่า"
+                    
+                    q = f"จงเปรียบเทียบว่า <b>{item_A}</b> กับ <b>{item_B}</b> สิ่งใดมีค่ามากกว่ากัน?<br><span style='font-size:22px; font-weight:bold; margin-left: 20px;'>{item_A} &nbsp;&nbsp; ____________________ &nbsp;&nbsp; {item_B}</span>"
+
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (เปรียบเทียบทศนิยมกับจำนวนเต็ม):</b><br>
+                    <b>ขั้นที่ 1: ทบทวนความสัมพันธ์ของหน่วย</b><br>
+                    👉 1 {u_major} เท่ากับ <b>{multiplier:,} {u_minor}</b><br>
+                    <b>ขั้นที่ 2: แปลงหน่วยให้เหมือนกัน (แปลง {u_major} เป็น {u_minor})</b><br>"""
+                    
+                    if is_a_major:
+                        sol += f"👉 ฝั่งซ้าย: {val_A_major} {u_major} = {val_A_major} × {multiplier:,} = <b>{val_A_minor_total:,} {u_minor}</b><br>"
+                        sol += f"👉 ฝั่งขวา: มีหน่วยเป็น {u_minor} อยู่แล้ว คือ <b>{val_B_minor_total:,} {u_minor}</b><br>"
+                    else:
+                        sol += f"👉 ฝั่งซ้าย: มีหน่วยเป็น {u_minor} อยู่แล้ว คือ <b>{val_B_minor_total:,} {u_minor}</b><br>"
+                        sol += f"👉 ฝั่งขวา: {val_A_major} {u_major} = {val_A_major} × {multiplier:,} = <b>{val_A_minor_total:,} {u_minor}</b><br>"
+                    
+                    sol += f"<b>ขั้นที่ 3: เปรียบเทียบตัวเลข</b><br>"
+                    
+                    if val_A > val_B:
+                        sign = ">"
+                        word_ans = "ฝั่งซ้าย มากกว่า"
+                    else:
+                        sign = "<"
+                        word_ans = "ฝั่งขวา มากกว่า"
+                        
+                    sol += f"👉 จะเห็นว่า <b>{val_A:,} {sign} {val_B:,}</b><br>"
+                    sol += f"<b>ตอบ: {word_ans}</b></span>"
 
             else:
                 q = f"⚠️ [ระบบผิดพลาด] ไม่พบเงื่อนไขสำหรับหัวข้อ: <b>{actual_sub_t}</b>"
@@ -1569,7 +1630,7 @@ if st.sidebar.button(btn_text, type="primary", use_container_width=True):
         st.session_state['zip_data'] = zip_buffer.getvalue()
 
 if 'ebook_html' in st.session_state:
-    st.success(f"✅ สำเร็จแล้วครับ! แยกหัวข้อ ห.ร.ม. และ ค.ร.น. ออกจากกัน พร้อมแสดงตารางหารสั้นในเฉลยเรียบร้อยแล้วครับ")
+    st.success(f"✅ สำเร็จแล้วครับ! ปรับปรุงโจทย์เพื่อลดการซ้ำซ้อน และเพิ่มความยากให้เหมาะสมกับ O-NET ป.6 เรียบร้อยครับ")
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
