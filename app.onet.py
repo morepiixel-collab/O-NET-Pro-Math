@@ -432,6 +432,43 @@ def draw_matchstick_pattern(shape):
         svg += f'<text x="{ox+75}" y="80" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 3 (10)</text>'
         svg += '<text x="390" y="55" font-size="24" font-weight="bold">. . .</text>'
         
+    elif shape == "pentagon":
+        svg += m_line(30, 60, 60, 60)
+        svg += m_line(30, 60, 30, 35)
+        svg += m_line(60, 60, 60, 35)
+        svg += m_line(30, 35, 45, 15)
+        svg += m_line(45, 15, 60, 35)
+        svg += '<text x="45" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 1 (5)</text>'
+        
+        ox = 90
+        svg += m_line(ox+30, 60, ox+60, 60)
+        svg += m_line(ox+30, 60, ox+30, 35)
+        svg += m_line(ox+60, 60, ox+60, 35)
+        svg += m_line(ox+30, 35, ox+45, 15)
+        svg += m_line(ox+45, 15, ox+60, 35)
+        svg += m_line(ox+60, 60, ox+90, 60)
+        svg += m_line(ox+90, 60, ox+90, 35)
+        svg += m_line(ox+60, 35, ox+75, 15)
+        svg += m_line(ox+75, 15, ox+90, 35)
+        svg += f'<text x="{ox+60}" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 2 (9)</text>'
+        
+        ox = 210
+        svg += m_line(ox+30, 60, ox+60, 60)
+        svg += m_line(ox+30, 60, ox+30, 35)
+        svg += m_line(ox+60, 60, ox+60, 35)
+        svg += m_line(ox+30, 35, ox+45, 15)
+        svg += m_line(ox+45, 15, ox+60, 35)
+        svg += m_line(ox+60, 60, ox+90, 60)
+        svg += m_line(ox+90, 60, ox+90, 35)
+        svg += m_line(ox+60, 35, ox+75, 15)
+        svg += m_line(ox+75, 15, ox+90, 35)
+        svg += m_line(ox+90, 60, ox+120, 60)
+        svg += m_line(ox+120, 60, ox+120, 35)
+        svg += m_line(ox+90, 35, ox+105, 15)
+        svg += m_line(ox+105, 15, ox+120, 35)
+        svg += f'<text x="{ox+75}" y="85" font-family="Sarabun" font-size="14" fill="#333" text-anchor="middle">รูปที่ 3 (13)</text>'
+        svg += '<text x="380" y="55" font-size="24" font-weight="bold">. . .</text>'
+        
     svg += '</svg></div>'
     return svg
 
@@ -1140,11 +1177,11 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         <b>ตอบ: {ans_rem} บาท</b></span>"""
                         
                 elif scenario == "money":
-                    # ซื้อของสองอย่าง หาเงินที่เหลือ
                     total = random.choice([1200, 2400, 3600, 4800])
-                    # Fix fractions like 1/3 and 1/4
-                    den1, den2 = 3, 4
-                    num1, num2 = 1, 1
+                    den1 = 3
+                    den2 = 4
+                    num1 = 1
+                    num2 = 1
                     
                     spent1 = (total * num1) // den1
                     spent2 = (total * num2) // den2
@@ -1166,7 +1203,6 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     <b>ตอบ: {rem:,} บาท</b></span>"""
                     
                 else: # pole
-                    # เสาปักในโคลน
                     tot_m = random.choice([12, 15, 18, 20, 24])
                     f_mud = get_vertical_fraction(1, 3)
                     f_water = get_vertical_fraction(1, 4)
@@ -1432,7 +1468,7 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                 
                 if scenario == "number_seq":
                     if is_challenge:
-                        pattern_type = random.choice(["square", "cube", "square_plus_one", "double_square"])
+                        pattern_type = random.choice(["square", "cube", "square_plus_one", "double_square", "rectangle", "square_minus_one", "three_n_square"])
                         target_term = random.randint(10, 20)
                         
                         if pattern_type == "square":
@@ -1456,6 +1492,27 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                             ans = target_term**2 + 1
                             formula_txt = "นำตำแหน่งที่ N ยกกำลังสอง แล้วบวกเพิ่มอีก 1 (N² + 1)"
                             calc_txt = f"({target_term} × {target_term}) + 1"
+                        elif pattern_type == "square_minus_one":
+                            seq = []
+                            for i in range(1, 6):
+                                seq.append(i**2 - 1)
+                            ans = target_term**2 - 1
+                            formula_txt = "นำตำแหน่งที่ N ยกกำลังสอง แล้วลบออก 1 (N² - 1)"
+                            calc_txt = f"({target_term} × {target_term}) - 1"
+                        elif pattern_type == "three_n_square":
+                            seq = []
+                            for i in range(1, 6):
+                                seq.append(3 * (i**2))
+                            ans = 3 * (target_term**2)
+                            formula_txt = "นำตำแหน่งที่ N ยกกำลังสอง แล้วคูณด้วย 3 (3 × N²)"
+                            calc_txt = f"3 × ({target_term} × {target_term})"
+                        elif pattern_type == "rectangle":
+                            seq = []
+                            for i in range(1, 6):
+                                seq.append(i * (i+1))
+                            ans = target_term * (target_term + 1)
+                            formula_txt = "นำตำแหน่งที่ N คูณกับตำแหน่งถัดไป (N × (N+1))"
+                            calc_txt = f"{target_term} × {target_term+1}"
                         else: 
                             seq = []
                             for i in range(1, 6):
@@ -1477,6 +1534,16 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                                         svg_graphic += f'<rect x="{x_offset + c*size}" y="{50 - i*size + r*size}" width="{size-2}" height="{size-2}" fill="#3498db" rx="2"/>'
                                 svg_graphic += f'<text x="{x_offset + (i*size)/2}" y="58" font-family="sans-serif" font-size="12" text-anchor="middle">{i**2}</text>'
                             svg_graphic += '</svg></div>'
+                        elif pattern_type == "rectangle":
+                            svg_graphic = f'<div style="text-align:center; margin:10px 0;"><svg height="60" width="350">'
+                            for i in range(1, 4):
+                                x_offset = (i-1)*100 + 20
+                                size = 12
+                                for r in range(i):
+                                    for c in range(i+1):
+                                        svg_graphic += f'<rect x="{x_offset + c*size}" y="{50 - i*size + r*size}" width="{size-2}" height="{size-2}" fill="#2ecc71" rx="2"/>'
+                                svg_graphic += f'<text x="{x_offset + ((i+1)*size)/2}" y="58" font-family="sans-serif" font-size="12" text-anchor="middle">{i*(i+1)}</text>'
+                            svg_graphic += '</svg></div>'
 
                         q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br>{svg_graphic}<span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{seq_str}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
                         sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (อนุกรมประยุกต์):</b><br>
@@ -1492,23 +1559,22 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         👉 แทนค่าลงในสมการ: {calc_txt} = <b>{ans:,}</b><br>
                         <b>ตอบ: {ans:,}</b></span>"""
                     else:
-                        start_num = random.randint(2, 50)
-                        diff = random.randint(4, 15)
-                        is_add = random.choice([True, False])
+                        progression_type = random.choice(["arithmetic_add", "arithmetic_sub", "arithmetic_add"])
                         
-                        if not is_add:
-                            start_num = random.randint(200, 500)
-                            
-                        target_term = random.randint(15, 40)
-                        
-                        if is_add:
+                        if progression_type == "arithmetic_add":
+                            start_num = random.randint(2, 50)
+                            diff = random.randint(4, 15)
+                            target_term = random.randint(15, 40)
                             ans = start_num + (target_term - 1) * diff
                             seq = []
                             for i in range(4):
                                 seq.append(start_num + i * diff)
                             word_diff = f"เพิ่มขึ้น <b>+{diff}</b>"
                             sign = "+"
-                        else:
+                        elif progression_type == "arithmetic_sub":
+                            start_num = random.randint(200, 500)
+                            diff = random.randint(4, 15)
+                            target_term = random.randint(15, 40)
                             ans = start_num - (target_term - 1) * diff
                             seq = []
                             for i in range(4):
@@ -1535,68 +1601,114 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         <b>ตอบ: {ans:,}</b></span>"""
                 
                 elif scenario == "matchstick":
-                    # ไม้ขีดไฟเรียงเป็นสามเหลี่ยม (1=3, 2=5, 3=7...)
-                    target_term = random.randint(15, 35)
-                    ans = 2 * target_term + 1
+                    shape_choice = random.choice(["triangle", "square", "pentagon"])
                     
                     if is_challenge:
-                        shape_choice = "triangle"
-                        svg_graphic = draw_matchstick_pattern(shape_choice)
-                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสามเหลี่ยมเรียงต่อกันไปเรื่อยๆ <br>{svg_graphic}<br>รูปที่ 1 ใช้ไม้ขีดไฟ 3 ก้าน, รูปที่ 2 ใช้ 5 ก้าน, รูปที่ 3 ใช้ 7 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
-                        sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (วิเคราะห์รูปทรง):</b><br>
-                        <b>ขั้นตอนที่ 1: สังเกตการเพิ่มขึ้นของไม้ขีดไฟ</b><br>
-                        👉 รูปที่ 1 ใช้ 3 ก้าน<br>
-                        👉 รูปที่ 2 ใช้ 5 ก้าน (เพิ่มมา 2 ก้าน)<br>
-                        👉 รูปที่ 3 ใช้ 7 ก้าน (เพิ่มมา 2 ก้าน)<br>
-                        👉 สรุปได้ว่า สามเหลี่ยม 1 รูปใหม่ที่งอกออกมา จะใช้ไม้ขีดไฟแชร์ร่วมกับอันเดิม จึงใช้เพิ่มแค่รูปละ 2 ก้าน<br>
-                        <b>ขั้นตอนที่ 2: ตั้งสมการความสัมพันธ์</b><br>
-                        👉 ทุกรูปต้องเริ่มต้นด้วยไม้ขีดไฟ 1 ก้านเป็นฐานหลัก (แกนยืน) แล้วเพิ่มก้านรูปตัว V (ทีละ 2 ก้าน) ตามลำดับ<br>
-                        👉 สมการลัด: <b>จำนวนไม้ขีดไฟ = 1 + (ตำแหน่งของรูป × 2)</b><br>
-                        <b>ขั้นตอนที่ 3: แทนค่าคำนวณ</b><br>
-                        👉 โจทย์ถามหารูปที่ {target_term}<br>
-                        👉 แทนค่า: 1 + ({target_term} × 2) = 1 + {target_term * 2} = <b>{ans} ก้าน</b><br>
-                        <b>ตอบ: {ans} ก้าน</b></span>"""
+                        target_term = random.randint(20, 50)
                     else:
-                        shape_choice = "square"
-                        svg_graphic = draw_matchstick_pattern(shape_choice)
-                        target_term = random.randint(10, 20)
-                        ans = 3 * target_term + 1
+                        target_term = random.randint(10, 19)
                         
-                        q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็นรูปสี่เหลี่ยมจัตุรัสเรียงต่อกันไปเรื่อยๆ <br>{svg_graphic}<br>รูปที่ 1 ใช้ไม้ขีดไฟ 4 ก้าน, รูปที่ 2 ใช้ 7 ก้าน, รูปที่ 3 ใช้ 10 ก้าน... <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
-                        sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (วิเคราะห์รูปทรง):</b><br>
-                        <b>ขั้นตอนที่ 1: สังเกตการเพิ่มขึ้นของไม้ขีดไฟ</b><br>
-                        👉 รูปที่ 1 ใช้ 4 ก้าน<br>
-                        👉 รูปที่ 2 ใช้ 7 ก้าน (เพิ่มมา 3 ก้าน)<br>
-                        👉 รูปที่ 3 ใช้ 10 ก้าน (เพิ่มมา 3 ก้าน)<br>
-                        👉 สรุปได้ว่า สี่เหลี่ยมรูปใหม่ที่งอกออกมา จะแชร์กำแพง 1 ด้านกับอันเดิม จึงใช้เพิ่มแค่รูปละ 3 ก้าน<br>
-                        <b>ขั้นตอนที่ 2: ตั้งสมการความสัมพันธ์</b><br>
-                        👉 ทุกรูปต้องเริ่มต้นด้วยไม้ขีดไฟ 1 ก้านตั้งต้นเสมอ แล้วเพิ่มรูปตัว C (ทีละ 3 ก้าน) ตามลำดับ<br>
-                        👉 สมการลัด: <b>จำนวนไม้ขีดไฟ = 1 + (ตำแหน่งของรูป × 3)</b><br>
-                        <b>ขั้นตอนที่ 3: แทนค่าคำนวณ</b><br>
-                        👉 โจทย์ถามหารูปที่ {target_term}<br>
-                        👉 แทนค่า: 1 + ({target_term} × 3) = 1 + {target_term * 3} = <b>{ans} ก้าน</b><br>
-                        <b>ตอบ: {ans} ก้าน</b></span>"""
+                    svg_graphic = draw_matchstick_pattern(shape_choice)
+                    
+                    if shape_choice == "triangle":
+                        ans = 2 * target_term + 1
+                        q_text = "รูปสามเหลี่ยมเรียงต่อกันไปเรื่อยๆ"
+                        seq_text = "รูปที่ 1 ใช้ไม้ขีดไฟ 3 ก้าน, รูปที่ 2 ใช้ 5 ก้าน, รูปที่ 3 ใช้ 7 ก้าน..."
+                        add_val = 2
+                        start_val = 3
+                    elif shape_choice == "square":
+                        ans = 3 * target_term + 1
+                        q_text = "รูปสี่เหลี่ยมจัตุรัสเรียงต่อกันไปเรื่อยๆ"
+                        seq_text = "รูปที่ 1 ใช้ไม้ขีดไฟ 4 ก้าน, รูปที่ 2 ใช้ 7 ก้าน, รูปที่ 3 ใช้ 10 ก้าน..."
+                        add_val = 3
+                        start_val = 4
+                    elif shape_choice == "pentagon":
+                        ans = 4 * target_term + 1
+                        q_text = "รูปห้าเหลี่ยม (รูปบ้าน) เรียงต่อกันไปเรื่อยๆ"
+                        seq_text = "รูปที่ 1 ใช้ไม้ขีดไฟ 5 ก้าน, รูปที่ 2 ใช้ 9 ก้าน, รูปที่ 3 ใช้ 13 ก้าน..."
+                        add_val = 4
+                        start_val = 5
+                        
+                    q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็น{q_text} <br>{svg_graphic}<br>{seq_text} <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (วิเคราะห์รูปทรง):</b><br>
+                    <b>ขั้นตอนที่ 1: สังเกตการเพิ่มขึ้นของไม้ขีดไฟ</b><br>
+                    👉 รูปที่ 1 ใช้ {start_val} ก้าน<br>
+                    👉 รูปที่ 2 ใช้ {start_val + add_val} ก้าน (เพิ่มมา {add_val} ก้าน)<br>
+                    👉 รูปที่ 3 ใช้ {start_val + add_val*2} ก้าน (เพิ่มมา {add_val} ก้าน)<br>
+                    👉 สรุปได้ว่า รูปใหม่ที่งอกออกมา จะแชร์ก้านไม้ขีดร่วมกับอันเดิม 1 ก้าน จึงใช้เพิ่มแค่รูปละ {add_val} ก้าน<br>
+                    <b>ขั้นตอนที่ 2: ตั้งสมการความสัมพันธ์</b><br>
+                    👉 ทุกรูปต้องเริ่มต้นด้วยไม้ขีดไฟ 1 ก้านเป็นฐานหลักตั้งต้นเสมอ แล้วเพิ่มรูปทรง (ทีละ {add_val} ก้าน) ตามลำดับตำแหน่ง<br>
+                    👉 สมการลัด: <b>จำนวนไม้ขีดไฟ = 1 + (ตำแหน่งของรูป × {add_val})</b><br>
+                    <b>ขั้นตอนที่ 3: แทนค่าคำนวณ</b><br>
+                    👉 โจทย์ถามหารูปที่ {target_term}<br>
+                    👉 แทนค่า: 1 + ({target_term} × {add_val}) = 1 + {target_term * add_val} = <b>{ans} ก้าน</b><br>
+                    <b>ตอบ: {ans} ก้าน</b></span>"""
                         
                 else: # fraction_seq
-                    target_term = random.randint(12, 25)
-                    num_ans = target_term
-                    den_ans = target_term + 1
+                    frac_pattern = random.choice(["type1", "type2", "type3", "type4"])
                     
-                    f1 = get_vertical_fraction(1, 2)
-                    f2 = get_vertical_fraction(2, 3)
-                    f3 = get_vertical_fraction(3, 4)
+                    if is_challenge:
+                        target_term = random.randint(20, 50)
+                    else:
+                        target_term = random.randint(10, 19)
+                        
+                    if frac_pattern == "type1":
+                        num_ans = target_term
+                        den_ans = target_term + 1
+                        f1 = get_vertical_fraction(1, 2)
+                        f2 = get_vertical_fraction(2, 3)
+                        f3 = get_vertical_fraction(3, 4)
+                        formula_top = f'<b>"เท่ากับ"</b> ตำแหน่งของรูปนั้นพอดี'
+                        formula_bot = f'<b>"มากกว่า"</b> ตำแหน่งของรูปอยู่ 1 แต้มเสมอ'
+                        eq_str = "N / (N+1)"
+                        den_calc = f"{target_term} + 1 = {den_ans}"
+                        num_calc = f"{target_term}"
+                    elif frac_pattern == "type2":
+                        num_ans = target_term
+                        den_ans = target_term + 2
+                        f1 = get_vertical_fraction(1, 3)
+                        f2 = get_vertical_fraction(2, 4)
+                        f3 = get_vertical_fraction(3, 5)
+                        formula_top = f'<b>"เท่ากับ"</b> ตำแหน่งของรูปนั้นพอดี'
+                        formula_bot = f'<b>"มากกว่า"</b> ตำแหน่งของรูปอยู่ 2 แต้มเสมอ'
+                        eq_str = "N / (N+2)"
+                        den_calc = f"{target_term} + 2 = {den_ans}"
+                        num_calc = f"{target_term}"
+                    elif frac_pattern == "type3":
+                        num_ans = 2 * target_term - 1
+                        den_ans = 2 * target_term
+                        f1 = get_vertical_fraction(1, 2)
+                        f2 = get_vertical_fraction(3, 4)
+                        f3 = get_vertical_fraction(5, 6)
+                        formula_top = f'<b>"นำตำแหน่งคูณ 2 แล้วลบ 1"</b> (เป็นเลขคี่เรียงกันเริ่มที่ 1)'
+                        formula_bot = f'<b>"นำตำแหน่งคูณ 2"</b> (เป็นเลขคู่เรียงกันเริ่มที่ 2)'
+                        eq_str = "(2N - 1) / 2N"
+                        den_calc = f"{target_term} × 2 = {den_ans}"
+                        num_calc = f"({target_term} × 2) - 1 = {num_ans}"
+                    elif frac_pattern == "type4":
+                        num_ans = target_term
+                        den_ans = 2 * target_term + 1
+                        f1 = get_vertical_fraction(1, 3)
+                        f2 = get_vertical_fraction(2, 5)
+                        f3 = get_vertical_fraction(3, 7)
+                        formula_top = f'<b>"เท่ากับ"</b> ตำแหน่งของรูปนั้นพอดี'
+                        formula_bot = f'<b>"นำตำแหน่งคูณ 2 แล้วบวก 1"</b> (เป็นเลขคี่เริ่มที่ 3)'
+                        eq_str = "N / (2N + 1)"
+                        den_calc = f"({target_term} × 2) + 1 = {den_ans}"
+                        num_calc = f"{target_term}"
+                        
                     f_ans = get_vertical_fraction(num_ans, den_ans)
                     
                     q = f"จงพิจารณาแบบรูปของเศษส่วนต่อไปนี้: <br><span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{f1}, {f2}, {f3}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือเศษส่วนใด?"
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (แบบรูปเศษส่วน):</b><br>
                     <b>ขั้นตอนที่ 1: แยกวิเคราะห์ตัวเศษ (ด้านบน) และตัวส่วน (ด้านล่าง)</b><br>
-                    👉 <b>ตัวเศษ (บน):</b> สังเกตว่าเป็น 1, 2, 3... แสดงว่าตัวเศษมีค่า <b>"เท่ากับ"</b> ตำแหน่งของรูปนั้นพอดี<br>
-                    👉 <b>ตัวส่วน (ล่าง):</b> สังเกตว่าเป็น 2, 3, 4... แสดงว่าตัวส่วนมีค่า <b>"มากกว่า"</b> ตำแหน่งของรูปอยู่ 1 แต้มเสมอ<br>
+                    👉 <b>ตัวเศษ (บน):</b> สังเกตว่า {formula_top}<br>
+                    👉 <b>ตัวส่วน (ล่าง):</b> สังเกตว่า {formula_bot}<br>
                     <b>ขั้นตอนที่ 2: สรุปสมการความสัมพันธ์</b><br>
-                    👉 รูปที่ N จะได้เศษส่วนคือ: <b>N / (N+1)</b><br>
+                    👉 รูปที่ N จะได้เศษส่วนคือ: <b>{eq_str}</b><br>
                     <b>ขั้นตอนที่ 3: แทนค่าหาคำตอบ</b><br>
                     👉 โจทย์ถามหารูปที่ {target_term}<br>
-                    👉 แทน N = {target_term} จะได้ตัวเศษ = {target_term} และตัวส่วน = {target_term} + 1 = {den_ans}<br>
+                    👉 แทนค่า N = {target_term} จะได้ตัวเศษ = {num_calc} และตัวส่วน = {den_calc}<br>
                     <b>ตอบ: {f_ans}</b></span>"""
 
             elif actual_sub_t == "สถิติและค่าเฉลี่ย":
@@ -1808,9 +1920,80 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         <b>ตอบ: {ans_str}</b></span>"""
 
             elif actual_sub_t == "การแปลงหน่วยและเปรียบเทียบ":
-                scenario = random.choice(["compare_dec", "time_convert"])
+                scenario = random.choice(["compare_dec", "time_convert", "cut_pieces"])
                 
-                if scenario == "time_convert":
+                if scenario == "cut_pieces":
+                    type_choices = ["wire", "rice", "water"]
+                    c_type = random.choice(type_choices)
+                    
+                    if c_type == "wire":
+                        u_maj = "เมตร"
+                        u_min = "เซนติเมตร"
+                        mult = 100
+                        item = "ลวด"
+                        action = "ตัดแบ่งไปใช้งาน"
+                        unit = "เส้น"
+                    elif c_type == "rice":
+                        u_maj = "กิโลกรัม"
+                        u_min = "กรัม"
+                        mult = 1000
+                        item = "ข้าวสาร"
+                        action = "ตักแบ่งใส่ถุง"
+                        unit = "ถุง"
+                    else:
+                        u_maj = "ลิตร"
+                        u_min = "มิลลิลิตร"
+                        mult = 1000
+                        item = "น้ำยาล้างจาน"
+                        action = "แบ่งใส่ขวด"
+                        unit = "ขวด"
+                        
+                    total_maj = random.randint(8, 20)
+                    total_min = random.randint(10, mult-10)
+                    total_val = (total_maj * mult) + total_min
+                    
+                    pieces = random.randint(3, 8)
+                    per_piece_maj = random.randint(0, 1)
+                    per_piece_min = random.randint(100, 800)
+                    
+                    if per_piece_maj == 0 and per_piece_min < (mult//5):
+                        per_piece_min += (mult//2)
+                        
+                    per_piece_val = (per_piece_maj * mult) + per_piece_min
+                    used_val = pieces * per_piece_val
+                    
+                    while used_val >= total_val:
+                        total_maj += 5
+                        total_val = (total_maj * mult) + total_min
+                        
+                    rem_val = total_val - used_val
+                    rem_maj = rem_val // mult
+                    rem_min = rem_val % mult
+                    
+                    if per_piece_maj > 0:
+                        piece_txt = f"{per_piece_maj} {u_maj} {per_piece_min} {u_min}"
+                    else:
+                        piece_txt = f"{per_piece_min} {u_min}"
+                        
+                    if rem_maj > 0:
+                        ans_txt = f"{rem_maj} {u_maj} {rem_min} {u_min}"
+                    else:
+                        ans_txt = f"{rem_min} {u_min}"
+                        
+                    q = f"<b>{name}</b> มี{item}ทั้งหมด <b>{total_maj} {u_maj} {total_min} {u_min}</b> <br>นำไป{action}จำนวน <b>{pieces} {unit}</b> ({unit}ละเท่าๆ กัน) โดยแต่ละ{unit}ใช้ไป <b>{piece_txt}</b> <br>จะเหลือ{item}อยู่เท่าไร?"
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (การคำนวณหน่วยผสม):</b><br>
+                    <b>ขั้นที่ 1: แปลงหน่วยทั้งหมดให้เป็นหน่วยเล็กสุด ({u_min}) เพื่อให้คำนวณง่าย</b><br>
+                    👉 ของที่มีทั้งหมด: ({total_maj} × {mult:,}) + {total_min} = <b>{total_val:,} {u_min}</b><br>
+                    👉 ของที่ใช้ต่อ 1 {unit}: ({per_piece_maj} × {mult:,}) + {per_piece_min} = <b>{per_piece_val:,} {u_min}</b><br>
+                    <b>ขั้นที่ 2: คำนวณปริมาณที่ใช้ไปทั้งหมด</b><br>
+                    👉 ใช้ไป {pieces} {unit} ➔ นำไปคูณ: {pieces} × {per_piece_val:,} = <b>{used_val:,} {u_min}</b><br>
+                    <b>ขั้นที่ 3: หาปริมาณที่เหลือ</b><br>
+                    👉 นำปริมาณที่มีทั้งหมด หักลบด้วยปริมาณที่ใช้ไป: {total_val:,} - {used_val:,} = <b>{rem_val:,} {u_min}</b><br>
+                    <b>ขั้นที่ 4: แปลงกลับเป็นหน่วยผสม</b><br>
+                    👉 นำ {rem_val:,} ÷ {mult:,} จะได้ <b>{rem_maj} {u_maj}</b> และเศษ <b>{rem_min} {u_min}</b><br>
+                    <b>ตอบ: {ans_txt}</b></span>"""
+                
+                elif scenario == "time_convert":
                     days = random.randint(2, 5)
                     hours = random.randint(5, 20)
                     total_h = days * 24 + hours
@@ -2115,7 +2298,7 @@ if st.sidebar.button(btn_text, type="primary", use_container_width=True):
         st.session_state['zip_data'] = zip_buffer.getvalue()
 
 if 'ebook_html' in st.session_state:
-    st.success(f"✅ ลิขสิทธิ์นี้เป็นของ บ้านทีเด็ด เท่านั้น ห้ามนำไปขาย หรือแจกจ่าย ก่อนได้รับอนุญาต จาก บ้านทีเด็ด")
+    st.success(f"✅ สำเร็จแล้วครับ! โจทย์มีความหลากหลายมากขึ้น พร้อมรูปภาพประกอบ (รูปบ้าน/สามเหลี่ยม/สี่เหลี่ยม/ลูกบาศก์) และไม่ซ้ำซ้อนกันแล้วครับ")
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
