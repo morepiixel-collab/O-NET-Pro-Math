@@ -1564,14 +1564,51 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
             elif actual_sub_t == "แบบรูปและความสัมพันธ์ (Patterns)":
                 scenario = random.choice(["number_seq_dynamic", "matchstick_dynamic", "fraction_seq_dynamic"])
                 
+                # ----------------------------------------------------
+                # สร้างฟังก์ชันวาดจุด SVG แบบ Dynamic ไว้ในลูป
+                # ----------------------------------------------------
+                def draw_dynamic_dot_pattern(start_idx, shape):
+                    if shape == "square":
+                        svg = f'<div style="text-align:center; margin:10px 0;"><svg height="70" width="350">'
+                        for i in range(1, 4):
+                            actual_n = start_idx + i - 1
+                            x_offset = (i-1)*100 + 20
+                            size = min(15, 50 // actual_n)
+                            if size < 5: size = 5
+                            for r in range(actual_n):
+                                for c in range(actual_n):
+                                    svg += f'<rect x="{x_offset + c*size}" y="{60 - actual_n*size + r*size}" width="{size-1}" height="{size-1}" fill="#3498db" rx="1"/>'
+                            svg += f'<text x="{x_offset + (actual_n*size)/2}" y="70" font-family="sans-serif" font-size="12" text-anchor="middle">{actual_n**2}</text>'
+                        svg += '</svg></div>'
+                        return svg
+                    elif shape == "rectangle":
+                        svg = f'<div style="text-align:center; margin:10px 0;"><svg height="70" width="400">'
+                        for i in range(1, 4):
+                            actual_n = start_idx + i - 1
+                            x_offset = (i-1)*120 + 20
+                            size = min(12, 50 // actual_n)
+                            if size < 5: size = 5
+                            for r in range(actual_n):
+                                for c in range(actual_n + 1):
+                                    svg += f'<rect x="{x_offset + c*size}" y="{60 - actual_n*size + r*size}" width="{size-1}" height="{size-1}" fill="#2ecc71" rx="1"/>'
+                            svg += f'<text x="{x_offset + ((actual_n+1)*size)/2}" y="70" font-family="sans-serif" font-size="12" text-anchor="middle">{actual_n*(actual_n+1)}</text>'
+                        svg += '</svg></div>'
+                        return svg
+                    return ""
+                
+                # ----------------------------------------------------
+                if is_challenge:
+                    target_term = random.randint(25, 99)
+                else:
+                    target_term = random.randint(11, 35)
+
                 if scenario == "number_seq_dynamic":
                     offset = random.randint(2, 6) # จุดเริ่มต้นสุ่มใหม่ ไม่เริ่มที่ 1
-                    target_term = random.randint(15, 30)
                     
                     if is_challenge:
-                        pattern_type = random.choice(["square", "cube", "square_plus_k"])
+                        pattern_type = random.choice(["square", "cube", "square_plus_k", "arithmetic_add", "arithmetic_sub"])
                     else:
-                        pattern_type = "square" # โหมดปกติเอาแค่นี้พอ
+                        pattern_type = random.choice(["square", "arithmetic_add", "arithmetic_sub"])
                         
                     seq = []
                     if pattern_type == "square":
@@ -1586,30 +1623,36 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         ans = (target_term + offset)**3
                         formula_txt = f"เกิดจากการนำ (ตำแหน่ง + {offset}) คูณกัน 3 ครั้ง"
                         calc_txt = f"({target_term} + {offset})³ = {target_term + offset} × {target_term + offset} × {target_term + offset}"
-                    else: 
+                    elif pattern_type == "square_plus_k": 
                         k_add = random.randint(1, 5)
                         for i in range(1, 5): 
                             seq.append(((i + offset)**2) + k_add)
                         ans = ((target_term + offset)**2) + k_add
                         formula_txt = f"เกิดจากการนำ (ตำแหน่ง + {offset}) ยกกำลังสอง แล้วบวกเพิ่มอีก {k_add}"
                         calc_txt = f"(({target_term} + {offset}) × ({target_term} + {offset})) + {k_add} = ({target_term + offset} × {target_term + offset}) + {k_add}"
+                    elif pattern_type == "arithmetic_add":
+                        start_num = random.randint(12, 80)
+                        diff = random.randint(4, 25)
+                        for i in range(1, 5):
+                            seq.append(start_num + (i - 1) * diff)
+                        ans = start_num + (target_term - 1) * diff
+                        formula_txt = f"ตัวเลขเพิ่มขึ้นทีละ {diff} เท่าๆ กัน"
+                        calc_txt = f"{start_num} + ({target_term}-1) × {diff}"
+                    else: # arithmetic_sub
+                        start_num = random.randint(200, 800)
+                        diff = random.randint(4, 25)
+                        for i in range(1, 5):
+                            seq.append(start_num - (i - 1) * diff)
+                        ans = start_num - (target_term - 1) * diff
+                        formula_txt = f"ตัวเลขลดลงทีละ {diff} เท่าๆ กัน"
+                        calc_txt = f"{start_num} - ({target_term}-1) × {diff}"
                     
                     seq_str = ", ".join(map(str, seq))
                     
                     # วาดรูปจุด SVG ให้เริ่มตาม offset
                     svg_graphic = ""
                     if pattern_type in ["square", "square_plus_k"]:
-                        svg_graphic = f'<div style="text-align:center; margin:10px 0;"><svg height="70" width="350">'
-                        for i in range(1, 4):
-                            actual_n = offset + i
-                            x_offset = (i-1)*100 + 20
-                            size = min(15, 50 // actual_n)
-                            if size < 5: size = 5
-                            for r in range(actual_n):
-                                for c in range(actual_n):
-                                    svg_graphic += f'<rect x="{x_offset + c*size}" y="{60 - actual_n*size + r*size}" width="{size-1}" height="{size-1}" fill="#3498db" rx="1"/>'
-                            svg_graphic += f'<text x="{x_offset + (actual_n*size)/2}" y="70" font-family="sans-serif" font-size="12" text-anchor="middle">{(actual_n)**2}</text>'
-                        svg_graphic += '</svg></div>'
+                        svg_graphic = draw_dynamic_dot_pattern(offset + 1, "square")
 
                     q = f"จงพิจารณาแบบรูปของจำนวนต่อไปนี้: <br>{svg_graphic}<span style='font-size:24px; font-weight:bold; margin-left: 20px;'>{seq_str}, ... </span><br>จงหาว่า <b>จำนวนที่ {target_term}</b> ของแบบรูปนี้คือจำนวนใด?"
                     sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (การหาสมการแบบรูปประยุกต์):</b><br>
@@ -1633,8 +1676,6 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                     if n_diff == d_diff: 
                         d_diff += 1 # กันไม่ให้ส่วนกับเศษเพิ่มเท่ากันเพื่อความสนุก
                         
-                    target_term = random.randint(15, 30)
-                    
                     f_seq = []
                     for i in range(3):
                         num = n_start + i * n_diff
@@ -1675,10 +1716,13 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         step_val, start_val = 5, 6
                         q_text = "รูปหกเหลี่ยม"
                         
-                    target_term = random.randint(20, 50) if is_challenge else random.randint(10, 19)
-                    total_sticks = 1 + target_term * step_val
+                    total_sticks = start_val + (target_term - 1) * step_val
                     
-                    svg_graphic = draw_matchstick_pattern(shape_choice)
+                    try:
+                        svg_graphic = draw_matchstick_pattern(shape_choice)
+                    except Exception:
+                        svg_graphic = ""
+                        
                     seq_text = f"รูปที่ 1 ใช้ไม้ขีดไฟ {start_val} ก้าน, รูปที่ 2 ใช้ {start_val + step_val} ก้าน, รูปที่ 3 ใช้ {start_val + step_val*2} ก้าน..."
                     
                     if is_inverse:
@@ -1688,12 +1732,13 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         👉 รูปที่ 1 ใช้ {start_val} ก้าน<br>
                         👉 รูปที่ 2 ใช้ {start_val + step_val} ก้าน (เพิ่มมา {step_val} ก้าน)<br>
                         👉 รูปที่ 3 ใช้ {start_val + step_val*2} ก้าน (เพิ่มมา {step_val} ก้าน)<br>
-                        👉 สมการคือ: <b>จำนวนไม้ขีดไฟ = 1 + (ตำแหน่งของรูป × {step_val})</b><br>
+                        👉 สมการคือ: <b>จำนวนไม้ขีดไฟ = {start_val} + (ตำแหน่งของรูป - 1) × {step_val}</b><br>
                         <b>ขั้นตอนที่ 2: ตั้งสมการเพื่อหาตำแหน่งของรูป (คิดย้อนกลับ)</b><br>
-                        👉 ให้ N แทนตำแหน่งของรูป จะได้: 1 + (N × {step_val}) = {total_sticks}<br>
+                        👉 ให้ N แทนตำแหน่งของรูป จะได้: {start_val} + (N - 1) × {step_val} = {total_sticks}<br>
                         <b>ขั้นตอนที่ 3: แก้สมการหาค่า N</b><br>
-                        👉 ย้าย 1 ไปลบ: N × {step_val} = {total_sticks} - 1 = {total_sticks - 1}<br>
-                        👉 ย้าย {step_val} ไปหาร: N = {total_sticks - 1} ÷ {step_val} = <b>{target_term}</b><br>
+                        👉 ย้ายไปลบ: (N - 1) × {step_val} = {total_sticks} - {start_val} = {total_sticks - start_val}<br>
+                        👉 ย้ายไปหาร: N - 1 = {total_sticks - start_val} ÷ {step_val} = {(total_sticks - start_val) // step_val}<br>
+                        👉 ย้ายไปบวก: N = {(total_sticks - start_val) // step_val} + 1 = <b>{target_term}</b><br>
                         <b>ตอบ: รูปที่ {target_term}</b></span>"""
                     else:
                         q = f"ถ้านำไม้ขีดไฟมาวางต่อกันเป็น{q_text}เรียงต่อกันไปเรื่อยๆ <br>{svg_graphic}<br>{seq_text} <br>จงหาว่า <b>รูปที่ {target_term}</b> จะต้องใช้ไม้ขีดไฟกี่ก้าน?"
@@ -1704,11 +1749,11 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
                         👉 รูปที่ 3 ใช้ {start_val + step_val*2} ก้าน (เพิ่มมา {step_val} ก้าน)<br>
                         👉 สรุปได้ว่า รูปใหม่ที่งอกออกมา จะแชร์ก้านไม้ขีดร่วมกับอันเดิม 1 ก้าน จึงใช้เพิ่มแค่รูปละ {step_val} ก้าน<br>
                         <b>ขั้นตอนที่ 2: ตั้งสมการความสัมพันธ์</b><br>
-                        👉 ทุกรูปต้องเริ่มต้นด้วยไม้ขีดไฟ 1 ก้านเป็นฐานหลักตั้งต้นเสมอ แล้วเพิ่มรูปทรง (ทีละ {step_val} ก้าน) ตามลำดับตำแหน่ง<br>
-                        👉 สมการลัด: <b>จำนวนไม้ขีดไฟ = 1 + (ตำแหน่งของรูป × {step_val})</b><br>
+                        👉 ทุกรูปต้องเริ่มต้นด้วยไม้ขีดไฟ {start_val} ก้านเป็นฐานหลักตั้งต้นเสมอ แล้วเพิ่มรูปทรง (ทีละ {step_val} ก้าน) ตามลำดับตำแหน่ง<br>
+                        👉 สมการลัด: <b>จำนวนไม้ขีดไฟ = {start_val} + (ตำแหน่งของรูป - 1) × {step_val}</b><br>
                         <b>ขั้นตอนที่ 3: แทนค่าคำนวณ</b><br>
                         👉 โจทย์ถามหารูปที่ {target_term}<br>
-                        👉 แทนค่า: 1 + ({target_term} × {step_val}) = 1 + {target_term * step_val} = <b>{total_sticks} ก้าน</b><br>
+                        👉 แทนค่า: {start_val} + ({target_term} - 1) × {step_val} = {start_val} + ({target_term - 1} × {step_val}) = <b>{total_sticks} ก้าน</b><br>
                         <b>ตอบ: {total_sticks} ก้าน</b></span>"""
 
             elif actual_sub_t == "สถิติและค่าเฉลี่ย":
