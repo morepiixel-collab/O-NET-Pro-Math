@@ -749,11 +749,54 @@ def generate_long_division_step_by_step_html(divisor, dividend, equation_html, i
     html += f"<div style='margin-top: 15px; color: #2c3e50;'><b>วิธีทำอย่างละเอียด:</b><br>1) นำตัวหาร ({divisor}) ไปหารตัวตั้ง ({dividend}) ทีละหลักจากซ้ายไปขวา<br>2) ท่องสูตรคูณแม่ {divisor} ว่าคูณอะไรแล้วได้ใกล้เคียงหรือเท่ากับตัวตั้งในหลักนั้นที่สุด (แต่ห้ามเกิน)<br>3) ใส่ผลลัพธ์ไว้ด้านบน และนำผลคูณมาลบกันด้านล่าง<br>4) ดึงตัวเลขในหลักถัดไปลงมา แล้วทำซ้ำขั้นตอนเดิมจนหมดทุกหลัก</div>"
     return html
 
+def generate_thai_number_text(num_str):
+    thai_nums = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"]
+    positions = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"]
+    parts = str(num_str).replace(",", "").split(".")
+    int_part = parts[0]
+    
+    if len(parts) > 1:
+        dec_part = parts[1]
+    else:
+        dec_part = ""
+    
+    def read_int(s):
+        if s == "0" or s == "": 
+            return "ศูนย์"
+        res = ""
+        length = len(s)
+        for i, digit in enumerate(s):
+            d = int(digit)
+            if d == 0: 
+                continue
+            pos = length - i - 1
+            if pos == 1 and d == 2: 
+                res += "ยี่สิบ"
+            elif pos == 1 and d == 1: 
+                res += "สิบ"
+            elif pos == 0 and d == 1 and length > 1: 
+                res += "เอ็ด"
+            else: 
+                res += thai_nums[d] + positions[pos]
+        return res
+        
+    int_text = read_int(int_part)
+    
+    if dec_part:
+        dec_text = "จุด"
+        for d in dec_part:
+            dec_text += thai_nums[int(d)]
+    else:
+        dec_text = ""
+        
+    return int_text + dec_text
+
 # ==========================================
 # 2. ฐานข้อมูลหัวข้อข้อสอบสำหรับ O-NET ป.6
 # ==========================================
 onet_p6_topics = [
-    "ตัวประกอบ ห.ร.ม. และ ค.ร.น.",
+    "โจทย์ปัญหา ห.ร.ม. (แบ่งของ)",
+    "โจทย์ปัญหา ค.ร.น. (เวลา/จุดนัดพบ)",
     "โจทย์ปัญหาเศษส่วนประยุกต์",
     "ร้อยละ เปอร์เซ็นต์ (กำไร/ลดราคา)",
     "สมการและโจทย์ปัญหาสมการ",
@@ -785,43 +828,83 @@ def generate_questions_logic(level, sub_t, num_q, is_challenge):
             name = random.choice(NAMES)
 
             # ---------------------------------------------------------
-            if actual_sub_t == "ตัวประกอบ ห.ร.ม. และ ค.ร.น.":
-                if is_challenge:
-                    f1 = random.choice(FRUITS)
+            if actual_sub_t == "โจทย์ปัญหา ห.ร.ม. (แบ่งของ)":
+                f1 = random.choice(FRUITS)
+                f2 = random.choice(FRUITS)
+                while f1 == f2:
                     f2 = random.choice(FRUITS)
-                    while f1 == f2:
-                        f2 = random.choice(FRUITS)
-                        
-                    gcd_val = random.randint(5, 15)
-                    m1 = random.randint(3, 7)
-                    m2 = random.randint(4, 9)
-                    while m1 == m2: 
-                        m2 = random.randint(4, 9)
                     
-                    qty1 = gcd_val * m1
-                    qty2 = gcd_val * m2
-                    total_baskets = m1 + m2
-                    
-                    q = f"<b>{name}</b> มี{f1} <b>{qty1} ผล</b> และ{f2} <b>{qty2} ผล</b> ต้องการแบ่งผลไม้ใส่ตะกร้า <br>โดยแต่ละตะกร้าต้องมีผลไม้ชนิดเดียวกัน จำนวนเท่าๆ กัน และให้ได้ <b>'จำนวนผลไม้ต่อตะกร้ามากที่สุด'</b> โดยไม่มีเศษเหลือ <br>จะต้องใช้ตะกร้าทั้งหมดกี่ใบ?"
-                    
-                    div_table = generate_short_division_html([qty1, qty2], mode="ห.ร.ม.")
-                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (โจทย์ปัญหา ห.ร.ม.):</b><br>
-                    โจทย์ที่มีคำว่า "แบ่งให้เท่าๆ กัน และได้จำนวนมากที่สุด" คือการหา <b>ห.ร.ม. (หารร่วมมาก)</b><br>
-                    <b>ขั้นตอนที่ 1: หาจำนวนผลไม้ที่มากที่สุดต่อ 1 ตะกร้า (หา ห.ร.ม.)</b><br>
-                    👉 นำจำนวนผลไม้ {qty1} และ {qty2} มาตั้งหารสั้น<br>
-                    {div_table}
-                    👉 ตัวเลข ห.ร.ม. ที่ได้คือ <b>{gcd_val}</b> (แสดงว่าต้องจัดตะกร้าละ {gcd_val} ผล)<br>
-                    <b>ขั้นตอนที่ 2: หาจำนวนตะกร้าของผลไม้แต่ละชนิด</b><br>
-                    👉 นำจำนวนผลไม้ตั้ง หารด้วยจำนวนต่อตะกร้า (หรือดูจากเศษที่เหลือด้านล่างสุดของการหารสั้นได้เลย!)<br>
-                    👉 {f1} {qty1} ผล จัดตะกร้าละ {gcd_val} ผล จะได้: {qty1} ÷ {gcd_val} = <b>{m1} ใบ</b><br>
-                    👉 {f2} {qty2} ผล จัดตะกร้าละ {gcd_val} ผล จะได้: {qty2} ÷ {gcd_val} = <b>{m2} ใบ</b><br>
-                    <b>ขั้นตอนที่ 3: หาจำนวนตะกร้าทั้งหมด</b><br>
-                    👉 นำจำนวนตะกร้ามาบวกกัน: {m1} + {m2} = <b>{total_baskets} ใบ</b><br>
-                    <b>ตอบ: {total_baskets} ใบ</b></span>"""
+                if is_challenge:
+                    gcd_val = random.randint(15, 30)
                 else:
-                    items_list = ["นาฬิกาปลุก", "ระฆัง", "สัญญาณไฟ"]
-                    item_word = random.choice(items_list)
-                    time_choices = [10, 12, 15, 20, 30]
+                    gcd_val = random.randint(5, 15)
+                    
+                m1 = random.randint(3, 7)
+                m2 = random.randint(4, 9)
+                while m1 == m2: 
+                    m2 = random.randint(4, 9)
+                
+                qty1 = gcd_val * m1
+                qty2 = gcd_val * m2
+                total_baskets = m1 + m2
+                
+                q = f"<b>{name}</b> มี{f1} <b>{qty1} ผล</b> และ{f2} <b>{qty2} ผล</b> ต้องการแบ่งผลไม้ใส่ตะกร้า <br>โดยแต่ละตะกร้าต้องมีผลไม้ชนิดเดียวกัน จำนวนเท่าๆ กัน และให้ได้ <b>'จำนวนผลไม้ต่อตะกร้ามากที่สุด'</b> โดยไม่มีเศษเหลือ <br>จะต้องใช้ตะกร้าทั้งหมดกี่ใบ?"
+                
+                div_table = generate_short_division_html([qty1, qty2], mode="ห.ร.ม.")
+                sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (โจทย์ปัญหา ห.ร.ม.):</b><br>
+                โจทย์ที่มีคำว่า "แบ่งให้เท่าๆ กัน และได้จำนวนมากที่สุด" คือการหา <b>ห.ร.ม. (หารร่วมมาก)</b><br>
+                <b>ขั้นตอนที่ 1: หาจำนวนผลไม้ที่มากที่สุดต่อ 1 ตะกร้า (หา ห.ร.ม.)</b><br>
+                👉 นำจำนวนผลไม้ {qty1} และ {qty2} มาตั้งหารสั้น<br>
+                {div_table}
+                👉 ตัวเลข ห.ร.ม. ที่ได้คือ <b>{gcd_val}</b> (แสดงว่าต้องจัดตะกร้าละ {gcd_val} ผล)<br>
+                <b>ขั้นตอนที่ 2: หาจำนวนตะกร้าของผลไม้แต่ละชนิด</b><br>
+                👉 นำจำนวนผลไม้ตั้ง หารด้วยจำนวนต่อตะกร้า (หรือดูจากผลลัพธ์เศษที่เหลือด้านล่างสุดของการหารสั้นได้เลย!)<br>
+                👉 {f1} {qty1} ผล จัดตะกร้าละ {gcd_val} ผล จะได้: {qty1} ÷ {gcd_val} = <b>{m1} ใบ</b><br>
+                👉 {f2} {qty2} ผล จัดตะกร้าละ {gcd_val} ผล จะได้: {qty2} ÷ {gcd_val} = <b>{m2} ใบ</b><br>
+                <b>ขั้นตอนที่ 3: หาจำนวนตะกร้าทั้งหมด</b><br>
+                👉 นำจำนวนตะกร้ามาบวกกัน: {m1} + {m2} = <b>{total_baskets} ใบ</b><br>
+                <b>ตอบ: {total_baskets} ใบ</b></span>"""
+
+            elif actual_sub_t == "โจทย์ปัญหา ค.ร.น. (เวลา/จุดนัดพบ)":
+                items_list = ["นาฬิกาปลุก", "ระฆัง", "สัญญาณไฟ"]
+                item_word = random.choice(items_list)
+                time_choices = [10, 12, 15, 20, 30, 45, 60]
+                
+                if is_challenge:
+                    l1 = random.choice(time_choices)
+                    l2 = random.choice(time_choices)
+                    while l2 == l1:
+                        l2 = random.choice(time_choices)
+                    l3 = random.choice(time_choices)
+                    while l3 == l1 or l3 == l2:
+                        l3 = random.choice(time_choices)
+                    l4 = random.choice(time_choices)
+                    while l4 == l1 or l4 == l2 or l4 == l3:
+                        l4 = random.choice(time_choices)
+                        
+                    lcm = lcm_multiple(l1, l2, l3, l4)
+                    ans_min = lcm // 60
+                    ans_sec = lcm % 60
+                    
+                    if ans_sec == 0:
+                        text_ans = f"{ans_min} นาที"
+                    else:
+                        text_ans = f"{ans_min} นาที {ans_sec} วินาที"
+                        
+                    q = f"<b>{item_word} 4 ชิ้น</b> ทำงานด้วยจังหวะที่ต่างกัน ดังนี้:<br>ชิ้นที่ 1 ดังทุกๆ {l1} วินาที, ชิ้นที่ 2 ดังทุกๆ {l2} วินาที, ชิ้นที่ 3 ดังทุกๆ {l3} วินาที, และชิ้นที่ 4 ดังทุกๆ {l4} วินาที <br>ถ้าเพิ่งดังพร้อมกันไป อีกกี่นาทีข้างหน้าจึงจะดังพร้อมกันอีกครั้ง?"
+                    
+                    div_table = generate_short_division_html([l1, l2, l3, l4], mode="ค.ร.น.")
+                    sol = f"""<span style='color:#2c3e50;'><b>วิธีคิดวิเคราะห์แบบ Step-by-Step (โจทย์ปัญหา ค.ร.น.):</b><br>
+                    โจทย์ที่มีคำว่า "เกิดขึ้นพร้อมกันอีกครั้ง" ให้ใช้การหา <b>ค.ร.น. (คูณร่วมน้อย)</b><br>
+                    <b>ขั้นตอนที่ 1: ตั้งหารสั้นเพื่อหา ค.ร.น.</b><br>
+                    👉 นำตัวเลขรอบเวลาทั้ง 4 ชิ้น มาตั้งหารสั้น<br>
+                    {div_table}
+                    👉 จะได้รอบเวลาที่ลงตัวพร้อมกันคือ <b>{lcm} วินาที</b><br>
+                    <b>ขั้นตอนที่ 2: แปลงหน่วยวินาทีเป็นนาทีและวินาที</b><br>
+                    👉 1 นาที มี 60 วินาที ให้นำ {lcm} ÷ 60<br>
+                    👉 จะได้ผลลัพธ์เท่ากับ <b>{text_ans}</b> พอดี<br>
+                    <b>ตอบ: {text_ans}</b></span>"""
+                else:
                     l1 = random.choice(time_choices)
                     l2 = random.choice(time_choices)
                     while l2 == l1:
@@ -1486,7 +1569,7 @@ if st.sidebar.button(btn_text, type="primary", use_container_width=True):
         st.session_state['zip_data'] = zip_buffer.getvalue()
 
 if 'ebook_html' in st.session_state:
-    st.success(f"✅ สำเร็จแล้วครับ! รักษาสถานะโค้ดฉบับเต็มโดยไม่ตัดไม่ยุบรวม และแก้ไข Syntax เรียบร้อยแล้วครับ")
+    st.success(f"✅ สำเร็จแล้วครับ! แยกหัวข้อ ห.ร.ม. และ ค.ร.น. ออกจากกัน พร้อมแสดงตารางหารสั้นในเฉลยเรียบร้อยแล้วครับ")
     c1, c2 = st.columns(2)
     with c1:
         st.download_button("📄 โหลดเฉพาะโจทย์", data=st.session_state['worksheet_html'], file_name=f"{st.session_state['filename_base']}_Worksheet.html", mime="text/html", use_container_width=True)
